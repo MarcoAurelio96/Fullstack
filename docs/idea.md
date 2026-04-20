@@ -9,7 +9,7 @@
 El mercado actual de aplicaciones de fitness presenta tres obstáculos principales:
 1. **Saturación y Complejidad:** Las apps más populares están llenas de publicidad, funciones sociales innecesarias y muros de pago.
 2. **Fragmentación:** Los deportistas híbridos deben alternar entre diferentes aplicaciones para registrar pesas y carreras.
-3. **Dependencia de Conexión:** Muchas herramientas fallan en entornos con mala cobertura al depender de bases de datos externas.
+3. **Falta de sincronización:** Muchas apps o son locales (se pierden los datos si cambias de móvil) o son nubes lentas. IronPace resuelve esto mediante una arquitectura web moderna con base de datos NoSQL, garantizando acceso rápido, seguro y sincronizado desde cualquier dispositivo.
 
 **IronPace** resuelve esto mediante una arquitectura local que prioriza la velocidad, la privacidad y la simplicidad "todo en uno".
 
@@ -23,10 +23,11 @@ El mercado actual de aplicaciones de fitness presenta tres obstáculos principal
 ---
 
 ## ✨ Funcionalidades Principales (MVP)
-- [ ] **Perfil de Usuario:** Registro de datos biométricos esenciales (Nombre, edad, peso y altura).
+- [ ] **Autenticación Segura:** Sistema de registro e inicio de sesión integrado con Firebase Auth, garantizando la privacidad y encriptación de las credenciales del usuario.
+- [ ] **Gestión de Base de Datos:** Los datos biométricos y el historial de entrenamientos se almacenan de forma segura en MongoDB, vinculados al ID único de Firebase del usuario.
 - [ ] **Módulo de Fuerza:** Interfaz para registrar ejercicios, series, repeticiones y peso.
 - [ ] **Módulo de Cardio:** Registro específico para "Correr" o "Andar" (distancia en km y tiempo).
-- [ ] **Persistencia Local:** Uso de `LocalStorage` para mantener los datos guardados en el navegador.
+- [ ] **Sincronización en la nube:** Uso de `MongoDB` como base de datos principal para almacenar los perfiles y registros, permitiendo acceso multiplataforma en tiempo real.
 - [ ] **Historial de Actividad:** Vista cronológica de todos los entrenamientos realizados.
 
 ---
@@ -52,4 +53,4 @@ El mercado actual de aplicaciones de fitness presenta tres obstáculos principal
 
 ---
 
-> **Nota Técnica:** Este proyecto no requiere base de datos externa en su fase inicial; utiliza `LocalStorage` para la gestión de datos del lado del cliente.
+> **Nota Técnica:** Este proyecto evoluciona hacia una arquitectura Full-Stack. El Frontend está desarrollado con React, mientras que el Backend utiliza Node.js y Express, conectados a una base de datos no relacional MongoDB. Esta estructura es el cimiento perfecto para soportar el futuro Marketplace y el análisis masivo de datos.
