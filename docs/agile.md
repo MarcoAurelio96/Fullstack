@@ -5,16 +5,16 @@ Agile o metodología Ágil, es un conjunto de prácticas en la que la colaboraci
 
 Agile sin embargo, ofrece pequeñas partes funcionales de manera temprana, para entregar valor al cliente de forma continua y no al final como el modelo tradicional. Lo que hace que la mejora sea constante y permite cambiar de rumbo si el cliente o las necesidades cambian.
 
-En la práctica de divide el proyecto en bloques de tiempo cortos llamados interacciones o sprints. Esos bloques se planifican por tiempo (de 1 a 4 semanas) y durante ese tiempo el equipo desarrolla la funcionalidad, seguida de una revisión para obtener el feedback del cliente. Para que finalmente se haga una retrospectiva para analizar como mejorar la forma de trabajo del equipo.
+En la práctica se divide el proyecto en bloques de tiempo cortos llamados iteraciones o sprints. Esos bloques se planifican por tiempo (de 1 a 4 semanas) y durante ese tiempo el equipo desarrolla la funcionalidad, seguida de una revisión para obtener el feedback del cliente. Para que finalmente se haga una retrospectiva para analizar como mejorar la forma de trabajo del equipo.
 
 
 ##SCRUM
-Si Agile es la mentalidad, Scrum el el manual de instrucciones.
+Si Agile es la mentalidad, Scrum es el manual de instrucciones.
 
 Se basa en el empirismo, que es aprender de la experiencia y en los ciclos cortos de trabajo para entregar valor real pronto.
 
 ###LOS ROLES
-Hay roles, el papel de jefe no existe, si no que hay responsabilidades claras:
+Hay roles, el papel de jefe no existe, sino que hay responsabilidades claras:
 - Product Owner (Dueño del Producto): Es la voz del cliente. Decide qué se debe hacer y prioriza las tareas para maximizar el valor del producto. Es el único responsable de gestionar el Backlog.
 
 - Scrum Master: Es un "líder servicial" y facilitador. Su trabajo es asegurar que el equipo entienda y aplique Scrum, eliminando obstáculos que frenen el avance.
