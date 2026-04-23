@@ -5,19 +5,35 @@ const workoutSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  type: {
+  category: {
     type: String,
     required: true,
-    enum: ['Correr', 'Andar', 'Fuerza'],
+    enum: ['Gym', 'Cardio'], 
   },
-  duration: {
-    type: Number,
+  name: {
+    type: String,
     required: true,
   },
-  distance: {
-    type: Number,
-    required: false, 
+  
+  bodyPart: {
+    type: String,
+    enum: ['Pecho', 'Biceps', 'Triceps', 'Espalda', 'Hombro', 'Pierna'],
+    required: false,
   },
+  sets: { type: Number, required: false },
+  reps: { type: Number, required: false },
+  weight: { type: Number, required: false },
+
+
+  cardioType: {
+    type: String,
+    enum: ['Andar', 'Correr'],
+    required: false,
+  },
+  distance: { type: Number, required: false },
+  duration: { type: Number, required: false }, // Lo hacemos opcional como pediste
+  pace: { type: Number, required: false },     // Ritmo opcional
+
   date: {
     type: Date,
     default: Date.now,

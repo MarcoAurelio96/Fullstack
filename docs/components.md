@@ -33,12 +33,28 @@ Tarjeta interactiva pequeña diseñada para seleccionar tipos de ejercicios o ca
 | `icon` | `React.ReactNode` | Icono central de la acción. |
 | `label` | `string` | Nombre de la acción o categoría. |
 
+### 4. `Modal`
+Ventana flotante reutilizable que se superpone a la interfaz principal para mostrar contenido temporal (formularios, alertas, etc.).
+
+**Props:**
+| Prop | Tipo | Descripción |
+| :--- | :--- | :--- |
+| `isOpen` | `boolean` | Controla si el modal es visible o no. |
+| `onClose` | `() => void` | Función que se ejecuta para cerrar el modal. |
+| `children`| `React.ReactNode` | El contenido a mostrar dentro del modal. |
+
+---
+
 ## Componentes Funcionales (Conexión a API)
 
-### 4. `AddWorkoutForm`
-Formulario para registrar un nuevo entrenamiento. Se conecta mediante peticiones `POST` al backend (`/api/workouts`).
+### 5. `GymExerciseForm`
+Formulario específico para registrar ejercicios de fuerza/gimnasio. Envía datos como series, repeticiones y peso al backend bajo la categoría "Gym".
 *No recibe props externas, consume el estado global de `AuthContext`.*
 
-### 5. `WorkoutList`
-Componente encargado de realizar una petición `GET` al backend para obtener y listar el historial de entrenamientos del usuario actual.
+### 6. `CardioSessionForm`
+Formulario específico para registrar sesiones aeróbicas (correr o andar). Permite registrar distancia de forma obligatoria, y duración/ritmo de forma opcional bajo la categoría "Cardio".
+*No recibe props externas, consume el estado global de `AuthContext`.*
+
+### 7. `WorkoutList`
+Componente encargado de realizar una petición `GET` al backend para obtener y listar el historial completo de entrenamientos del usuario actual.
 *No recibe props externas, consume el estado global de `AuthContext`.*
