@@ -9,19 +9,28 @@ import { DashboardCard } from "../components/DashboardCard";
 import { NavItem } from "../components/NavItem";
 import { ActionIconCard } from "../components/ActionIconCard";
 
-import { Modal } from "../components/modal";
+import { Modal } from "../components/Modal";
 import { GymExerciseForm } from "../components/GymExerciseForm";
 import { CardioSessionForm } from "../components/CardioSessionForm";
+
+import { GymSessionSelector } from "../components/GymSessionSelector";
+import { ActiveGymSession } from "../components/ActiveGymSession";
+import { CardioSessionSelector } from "../components/CardioSessionSelector";
+import { ActiveCardioSession } from "../components/ActiveCardioSession";
+
+type ModalType = "Gym" | "Cardio" | "ChooseSessionType" | "SelectGym" | "SelectCardio" | null;
 
 export const Dashboard = () => {
   const { currentUser } = useAuth();
   
-  // --- ESTADOS DEL MODAL ---
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<"Gym" | "Cardio" | null>(null);
+  const [modalType, setModalType] = useState<ModalType>(null);
+  
+  // Guardamos los datos de la sesión y también el "tipo" de sesión activa para saber qué componente pintar
+  const [activeSession, setActiveSession] = useState<any>(null);
+  const [activeSessionType, setActiveSessionType] = useState<"Gym" | "Cardio" | null>(null);
 
-  // Funciones para abrir y cerrar
-  const openModal = (type: "Gym" | "Cardio") => {
+  const openModal = (type: ModalType) => {
     setModalType(type);
     setIsModalOpen(true);
   };
@@ -29,6 +38,28 @@ export const Dashboard = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setTimeout(() => setModalType(null), 200); 
+  };
+
+  // --- MODIFICACIÓN 1: Actualizamos startSession para sumar ejercicios ---
+  const startSession = (exercises: any[], type: "Gym" | "Cardio") => {
+    if (activeSession && activeSessionType === type) {
+      // Si ya hay una sesión del mismo tipo, filtramos duplicados y sumamos
+      const newExercises = exercises.filter(ex => !activeSession.some((a: any) => a._id === ex._id));
+      setActiveSession([...activeSession, ...newExercises]);
+    } else {
+      // Si no hay sesión, la creamos desde cero
+      setActiveSession(exercises);
+      setActiveSessionType(type);
+    }
+    closeModal();
+  };
+
+  const finishSession = async (finalData: any[]) => {
+    console.log(`Guardando sesión completa (${activeSessionType}):`, finalData);
+    setTimeout(() => {
+      setActiveSession(null);
+      setActiveSessionType(null);
+    }, 2000);
   };
 
   const handleLogout = async () => {
@@ -41,29 +72,21 @@ export const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* --- BARRA DE NAVEGACIÓN --- */}
+      {/* NAVBAR */}
       <nav className="bg-white p-4 shadow-sm border-b border-gray-100">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          
           <div className="flex items-center gap-2 text-blue-600">
             <Activity size={32} strokeWidth={2.5} />
             <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Iron Pace</h1>
           </div>
-          
           <div className="flex gap-4">
             <NavItem icon={<Home size={24} />} label="Inicio" isActive />
             <NavItem icon={<Dumbbell size={24} />} label="Gym" />
             <NavItem icon={<Activity size={24} />} label="Cardio" />
             <NavItem icon={<Calendar size={24} />} label="Historial" />
           </div>
-
           <div className="flex items-center gap-6">
-            <button 
-              onClick={handleLogout}
-              className="text-gray-400 hover:text-red-500 text-sm font-semibold transition-colors"
-            >
-              Cerrar Sesión
-            </button>
+            <button onClick={handleLogout} className="text-gray-400 hover:text-red-500 text-sm font-semibold transition-colors">Cerrar Sesión</button>
             <div className="bg-gray-100 text-gray-600 p-3 rounded-full border border-gray-200 hover:bg-gray-200 transition-colors cursor-pointer">
               <User size={24} />
             </div>
@@ -71,30 +94,49 @@ export const Dashboard = () => {
         </div>
       </nav>
 
-      {/* --- CONTENIDO PRINCIPAL --- */}
+      {/* MAIN */}
       <main className="flex-grow p-12 relative">
         <div className="max-w-6xl mx-auto flex flex-col gap-12">
           
-          <DashboardCard 
-            title="Añade nuevos Ejercicios"
-            subtitle="Elige el tipo de ejercicio"
-          >
-            {/* 3. Añadimos eventos onClick a las tarjetas */}
-            <div onClick={() => openModal("Gym")}>
-              <ActionIconCard icon={<Dumbbell size={40} strokeWidth={1.5} />} label="Gym" />
-            </div>
-            <div onClick={() => openModal("Cardio")}>
-              <ActionIconCard icon={<Activity size={40} strokeWidth={1.5} />} label="Cardio" />
-            </div>
+          <DashboardCard title="Añade nuevos Ejercicios" subtitle="Elige el tipo de ejercicio">
+            <div onClick={() => openModal("Gym")}><ActionIconCard icon={<Dumbbell size={40} strokeWidth={1.5} />} label="Gym" /></div>
+            <div onClick={() => openModal("Cardio")}><ActionIconCard icon={<Activity size={40} strokeWidth={1.5} />} label="Cardio" /></div>
           </DashboardCard>
+
+          {/* RENDERIZADO CONDICIONAL DE LA SESIÓN ACTIVA */}
+          {activeSession && activeSessionType === "Gym" && (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+               <p className="text-blue-600 font-bold ml-4 mb-4 flex items-center gap-2">
+                 <span className="relative flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span></span>
+                 Tu sesión activa
+               </p>
+               {/* --- MODIFICACIÓN 2: Pasamos la prop onAddExercise --- */}
+               <ActiveGymSession 
+                 exercises={activeSession} 
+                 onFinish={finishSession} 
+                 onAddExercise={() => openModal("SelectGym")} 
+               />
+            </div>
+          )}
+
+          {activeSession && activeSessionType === "Cardio" && (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+               <p className="text-blue-600 font-bold ml-4 mb-4 flex items-center gap-2">
+                 <span className="relative flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span></span>
+                 Tu sesión activa
+               </p>
+               <ActiveCardioSession exercises={activeSession} onFinish={finishSession} />
+            </div>
+          )}
 
           <p className="text-gray-500 font-medium ml-4 -mb-8">¿Empezamos la sesión?</p>
 
-          <DashboardCard 
-            title="Nueva sesión de Entrenamiento"
-            subtitle="Selecciona los ejercicios de hoy"
-          >
-            <button className="bg-blue-50 text-blue-600 p-8 rounded-full border-2 border-blue-100 shadow-sm hover:bg-blue-100 hover:scale-105 transition-all duration-200">
+          <DashboardCard title="Nueva sesión de Entrenamiento" subtitle="Selecciona los ejercicios de hoy">
+            {/* EL BOTÓN ABRE EL MENÚ DE ELECCIÓN */}
+            <button 
+              onClick={() => openModal("ChooseSessionType")}
+              className="bg-blue-50 text-blue-600 p-8 rounded-full border-2 border-blue-100 shadow-sm hover:bg-blue-100 hover:scale-105 transition-all duration-200"
+            >
               <Plus size={48} strokeWidth={2} />
             </button>
           </DashboardCard>
@@ -102,10 +144,32 @@ export const Dashboard = () => {
         </div>
       </main>
 
-      {/* --- EL MODAL FLOTANTE --- */}
+      {/* MODALES */}
       <Modal isOpen={isModalOpen} onClose={closeModal}>
+        
+        {/* Formularios de creación */}
         {modalType === "Gym" && <GymExerciseForm />}
         {modalType === "Cardio" && <CardioSessionForm />}
+        
+        {/* Menú intermedio para elegir qué iniciar */}
+        {modalType === "ChooseSessionType" && (
+          <div className="p-8 text-center">
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">¿Qué toca hoy?</h3>
+            <p className="text-gray-500 mb-8">Elige el tipo de sesión que quieres comenzar</p>
+            <div className="flex justify-center gap-8">
+              <div onClick={() => setModalType("SelectGym")}>
+                <ActionIconCard icon={<Dumbbell size={48} strokeWidth={1.5} />} label="Gym" />
+              </div>
+              <div onClick={() => setModalType("SelectCardio")}>
+                <ActionIconCard icon={<Activity size={48} strokeWidth={1.5} />} label="Cardio" />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Selectores de plantillas */}
+        {modalType === "SelectGym" && <GymSessionSelector onSessionStart={(ex) => startSession(ex, "Gym")} />}
+        {modalType === "SelectCardio" && <CardioSessionSelector onSessionStart={(ex) => startSession(ex, "Cardio")} />}
       </Modal>
 
     </div>
