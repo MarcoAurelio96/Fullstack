@@ -9,7 +9,7 @@ import { DashboardCard } from "../components/DashboardCard";
 import { NavItem } from "../components/NavItem";
 import { ActionIconCard } from "../components/ActionIconCard";
 
-import { Modal } from "../components/Modal";
+import { Modal } from "../components/modal";
 import { GymExerciseForm } from "../components/GymExerciseForm";
 import { CardioSessionForm } from "../components/CardioSessionForm";
 
@@ -40,7 +40,6 @@ export const Dashboard = () => {
     setTimeout(() => setModalType(null), 200); 
   };
 
-  // --- MODIFICACIÓN 1: Actualizamos startSession para sumar ejercicios ---
   const startSession = (exercises: any[], type: "Gym" | "Cardio") => {
     if (activeSession && activeSessionType === type) {
       // Si ya hay una sesión del mismo tipo, filtramos duplicados y sumamos
@@ -55,12 +54,31 @@ export const Dashboard = () => {
   };
 
   const finishSession = async (finalData: any[]) => {
-    console.log(`Guardando sesión completa (${activeSessionType}):`, finalData);
-    setTimeout(() => {
-      setActiveSession(null);
-      setActiveSessionType(null);
-    }, 2000);
-  };
+    try {
+      // Enviamos la sesión terminada a MongoDB
+      const response = await fetch("http://localhost:5000/api/sessions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userEmail: currentUser?.email,
+          sessionType: activeSessionType,
+          exercises: finalData
+        }),
+      });
+
+      if (!response.ok) throw new Error("Error al guardar la sesión");
+
+      console.log("¡Sesión guardada en la base de datos con éxito! 🎉");
+      
+    } catch (error) {
+      console.error("Hubo un problema al guardar el historial:", error);
+    } finally {
+      setTimeout(() => {
+        setActiveSession(null);
+        setActiveSessionType(null);
+      }, 2000);
+    }
+    };
 
   const handleLogout = async () => {
     try {
