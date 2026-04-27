@@ -7,23 +7,19 @@ interface ModalProps {
 }
 
 export const Modal = ({ isOpen, onClose, children }: ModalProps) => {
-  // Si no está abierto, no renderizamos nada
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      {/* Contenedor del Modal */}
-      <div className="relative w-full max-w-2xl bg-gray-50 rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-iron-900/90 backdrop-blur-sm">
+      <div className="relative w-full max-w-lg bg-iron-800 border-2 border-iron-700 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
         
-        {/* Botón flotante de cerrar */}
-        <button
+        <button 
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 bg-white rounded-full text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors shadow-sm"
+          className="absolute top-5 right-5 text-gray-400 hover:text-iron-accent transition-colors z-10 bg-iron-900 p-1.5 rounded-full"
         >
-          <X size={24} />
+          <X size={20} strokeWidth={3} />
         </button>
-
-        {/* Aquí dentro inyectaremos el formulario (Gym o Cardio) */}
+        
         <div className="p-2">
           {children}
         </div>

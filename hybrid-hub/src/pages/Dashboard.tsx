@@ -9,7 +9,7 @@ import { DashboardCard } from "../components/DashboardCard";
 import { NavItem } from "../components/NavItem";
 import { ActionIconCard } from "../components/ActionIconCard";
 
-import { Modal } from "../components/Modal";
+import { Modal } from "../components/modal";
 import { GymExerciseForm } from "../components/GymExerciseForm";
 import { CardioSessionForm } from "../components/CardioSessionForm";
 
@@ -19,12 +19,14 @@ import { CardioSessionSelector } from "../components/CardioSessionSelector";
 import { ActiveCardioSession } from "../components/ActiveCardioSession";
 
 import { SessionHistory } from "../components/SessionHistory";
+import { GymLibrary } from "../components/GymLibrary";
+import { CardioLibrary } from "../components/CardioLibrary";
 
 type ModalType = "Gym" | "Cardio" | "ChooseSessionType" | "SelectGym" | "SelectCardio" | null;
 
 export const Dashboard = () => {
   const { currentUser } = useAuth();
-  const [currentTab, setCurrentTab] = useState<"Inicio" | "Historial">("Inicio");
+  const [currentTab, setCurrentTab] = useState<"Inicio" | "Gym" | "Cardio" | "Historial">("Inicio");
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<ModalType>(null);
@@ -96,16 +98,13 @@ export const Dashboard = () => {
   };
 
   return (
-    // CONTENEDOR PRINCIPAL: Fondo oscuro sólido (bg-iron-900)
     <div className="min-h-screen bg-iron-900 flex flex-col font-sans selection:bg-iron-accent selection:text-iron-900">
       
-      {/* NAVBAR: Fondo un poco más claro (bg-iron-800) y estilo flat */}
       <nav className="bg-iron-800 p-4 border-b-4 border-iron-900">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           
           <div className="flex items-center gap-2 text-iron-accent">
             <Activity size={32} strokeWidth={3} />
-            {/* Título en dorado uppercase para estilo flat agresivo */}
             <h1 className="text-2xl font-extrabold text-iron-100 tracking-tight uppercase">Iron Pace</h1>
           </div>
           
@@ -113,8 +112,12 @@ export const Dashboard = () => {
             <div onClick={() => setCurrentTab("Inicio")} className="cursor-pointer">
               <NavItem icon={<Home size={24} />} label="Inicio" isActive={currentTab === "Inicio"} />
             </div>
-            <NavItem icon={<Dumbbell size={24} />} label="Gym" />
-            <NavItem icon={<Activity size={24} />} label="Cardio" />
+            <div onClick={() => setCurrentTab("Gym")} className="cursor-pointer">
+              <NavItem icon={<Dumbbell size={24} />} label="Gym" isActive={currentTab === "Gym"} />
+            </div>
+            <div onClick={() => setCurrentTab("Cardio")} className="cursor-pointer">
+              <NavItem icon={<Activity size={24} />} label="Cardio" isActive={currentTab === "Cardio"} />
+            </div>
             <div onClick={() => setCurrentTab("Historial")} className="cursor-pointer">
               <NavItem icon={<Calendar size={24} />} label="Historial" isActive={currentTab === "Historial"} />
             </div>
@@ -134,18 +137,16 @@ export const Dashboard = () => {
       <main className="flex-grow p-12 relative">
         <div className="max-w-6xl mx-auto flex flex-col gap-12">
           
-          {currentTab === "Inicio" ? (
+          
+          {currentTab === "Inicio" && (
             <>
-              {/* PRIMERA TARJETA: Añadir Ejercicios */}
               <DashboardCard 
                 title="AÑADE NUEVOS EJERCICIOS" 
                 subtitle="Elige el tipo de ejercicio"
               >
-                {/* --- CAMBIO SOLICITADO: BOTONES DORADOS --- */}
-                {/* Ahora ambos botones son bloques sólidos de golden-yellow (bg-iron-accent) */}
                 <div 
                   onClick={() => openModal("Gym")} 
-                  className="flex flex-col items-center gap-2 group"
+                  className="flex flex-col items-center gap-2 group cursor-pointer"
                 >
                   <div className="bg-iron-accent text-iron-900 p-6 rounded-full hover:scale-105 active:scale-95 transition-transform duration-200">
                     <Dumbbell size={36} strokeWidth={2.5} />
@@ -155,17 +156,15 @@ export const Dashboard = () => {
 
                 <div 
                   onClick={() => openModal("Cardio")} 
-                  className="flex flex-col items-center gap-2 group"
+                  className="flex flex-col items-center gap-2 group cursor-pointer"
                 >
                   <div className="bg-iron-accent text-iron-900 p-6 rounded-full hover:scale-105 active:scale-95 transition-transform duration-200">
                     <Activity size={36} strokeWidth={2.5} />
                   </div>
                   <span className="text-xl font-bold uppercase text-iron-accent group-hover:scale-105 transition-transform">Cardio</span>
                 </div>
-                {/* --- FIN DEL CAMBIO --- */}
               </DashboardCard>
 
-              {/* RENDERIZADO CONDICIONAL DE LA SESIÓN ACTIVA */}
               {activeSession && activeSessionType === "Gym" && (
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                    <p className="text-iron-accent font-bold ml-4 mb-4 flex items-center gap-2">
@@ -197,12 +196,10 @@ export const Dashboard = () => {
 
               <p className="text-iron-100 font-medium ml-4 -mb-8">¿Empezamos la sesión?</p>
 
-              {/* SEGUNDA TARJETA: Nueva sesión (Ejemplo dorado existente) */}
               <DashboardCard 
                 title="NUEVA SESIÓN DE ENTRENAMIENTO" 
                 subtitle="Selecciona los ejercicios de hoy"
               >
-                {/* Este botón ya era dorado y cuadrado, se mantiene como referencia */}
                 <button 
                   onClick={() => openModal("ChooseSessionType")}
                   className="bg-iron-accent text-iron-900 p-6 rounded-2xl hover:scale-105 active:scale-95 transition-transform duration-200"
@@ -211,14 +208,17 @@ export const Dashboard = () => {
                 </button>
               </DashboardCard>
             </>
-          ) : (
-            <SessionHistory />
           )}
+
+          {currentTab === "Historial" && <SessionHistory />}
+          
+          {currentTab === "Gym" && <GymLibrary />}
+          
+          {currentTab === "Cardio" && <CardioLibrary />}
           
         </div>
       </main>
 
-      {/* MODAL (sin cambiar los formularios internos por ahora) */}
       <Modal isOpen={isModalOpen} onClose={closeModal}>
         {modalType === "Gym" && <GymExerciseForm />}
         {modalType === "Cardio" && <CardioSessionForm />}
@@ -228,22 +228,21 @@ export const Dashboard = () => {
             <h3 className="text-2xl font-bold text-iron-100 mb-2 uppercase">¿Qué toca hoy?</h3>
             <p className="text-iron-100 mb-8 font-medium">Elige el tipo de sesión que quieres comenzar</p>
             <div className="flex justify-center gap-8">
-              {/* Los iconos dentro del modal también deberían ser dorados ahora */}
               <div 
                 onClick={() => setModalType("SelectGym")} 
-                className="flex flex-col items-center gap-2 group"
+                className="flex flex-col items-center gap-2 group cursor-pointer"
               >
-                <div className="bg-iron-accent text-iron-900 p-8 rounded-full hover:scale-105 transition-transform">
-                  <Dumbbell size={40} strokeWidth={3} />
+                <div className="bg-iron-accent text-iron-900 p-6 rounded-full hover:scale-105 transition-transform">
+                  <Dumbbell size={32} strokeWidth={2.5} />
                 </div>
                 <span className="text-lg font-bold uppercase text-iron-accent">Gym</span>
               </div>
               <div 
                 onClick={() => setModalType("SelectCardio")} 
-                className="flex flex-col items-center gap-2 group"
+                className="flex flex-col items-center gap-2 group cursor-pointer"
               >
-                <div className="bg-iron-accent text-iron-900 p-8 rounded-full hover:scale-105 transition-transform">
-                  <Activity size={40} strokeWidth={3} />
+                <div className="bg-iron-accent text-iron-900 p-6 rounded-full hover:scale-105 transition-transform">
+                  <Activity size={32} strokeWidth={2.5} />
                 </div>
                 <span className="text-lg font-bold uppercase text-iron-accent">Cardio</span>
               </div>

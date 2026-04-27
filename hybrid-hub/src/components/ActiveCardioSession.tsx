@@ -13,7 +13,7 @@ interface CardioExercise {
 interface ActiveCardioSessionProps {
   exercises: CardioExercise[];
   onFinish: (finalExercises: CardioExercise[]) => void;
-  onCancel: () => void; // NUEVO
+  onCancel: () => void;
 }
 
 export const ActiveCardioSession = ({ exercises, onFinish, onCancel }: ActiveCardioSessionProps) => {
@@ -30,60 +30,62 @@ export const ActiveCardioSession = ({ exercises, onFinish, onCancel }: ActiveCar
       particleCount: 150,
       spread: 70,
       origin: { y: 0.6 },
-      colors: ['#2563eb', '#3b82f6', '#60a5fa']
+      colors: ['#FFD369', '#EEEEEE', '#393E46']
     });
     onFinish(sessionExercises);
   };
 
   return (
-    <div className="w-full bg-white rounded-2xl border-2 border-blue-500 shadow-lg overflow-hidden animate-in slide-in-from-top duration-500">
-      <div className="bg-blue-600 p-4 text-white flex justify-between items-center">
+    <div className="w-full bg-iron-800 rounded-2xl border-4 border-iron-900 shadow-2xl overflow-hidden animate-in slide-in-from-top duration-500">
+      <div className="bg-iron-900 p-5 flex justify-between items-center border-b-2 border-iron-800">
         <div>
-          <h3 className="font-bold text-lg">Sesión de Cardio en curso 🏃‍♂️</h3>
-          <p className="text-blue-100 text-xs">Ajusta la distancia o el tiempo final</p>
-        </div>
-        <div className="bg-blue-500 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-          En vivo
+          <h3 className="font-black text-iron-100 uppercase tracking-tighter text-lg">Sesión Cardio en curso</h3>
+          <p className="text-iron-accent text-xs font-bold uppercase tracking-widest">En ruta • GPS Activo</p>
         </div>
       </div>
 
       <div className="p-6 space-y-4">
         {sessionExercises.map((ex) => (
-          <div key={ex._id} className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 gap-4">
+          <div key={ex._id} className="bg-iron-900 rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-6 border-2 border-transparent transition-all hover:border-iron-accent/30">
             
             <div className="flex items-center gap-4">
-              <div className="bg-white p-2 rounded-lg shadow-sm text-blue-600">
-                <ChevronRight size={20} />
+              <div className="bg-iron-800 p-3 rounded-xl text-iron-accent">
+                <Route size={24} strokeWidth={3} />
               </div>
               <div>
-                <h4 className="font-bold text-gray-800">{ex.name}</h4>
-                <p className="text-xs text-gray-500">{ex.cardioType}</p>
+                <h4 className="font-black text-iron-100 text-xl uppercase leading-none">{ex.name}</h4>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">{ex.cardioType}</p>
               </div>
             </div>
 
             <div className="flex items-center gap-4 self-end md:self-auto">
-              <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500 transition-all">
-                <Route size={16} className="text-gray-400" />
-                <input 
-                  type="number"
-                  value={ex.distance}
-                  onChange={(e) => updateField(ex._id, 'distance', e.target.value)}
-                  className="w-16 text-center font-bold text-gray-700 outline-none"
-                  step="0.1"
-                />
-                <span className="text-xs font-bold text-gray-400">km</span>
+              {/* INPUT DISTANCIA */}
+              <div className="flex flex-col items-center gap-2">
+                <span className="text-[10px] font-black text-iron-accent uppercase tracking-widest">KM</span>
+                <div className="bg-iron-800 border-2 border-iron-700 rounded-xl px-4 py-2 flex items-center">
+                   <input 
+                    type="number"
+                    value={ex.distance}
+                    onChange={(e) => updateField(ex._id, 'distance', e.target.value)}
+                    className="w-16 bg-transparent text-center font-black text-iron-100 outline-none text-xl"
+                    step="0.1"
+                  />
+                </div>
               </div>
 
-              <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500 transition-all">
-                <Timer size={16} className="text-gray-400" />
-                <input 
-                  type="number"
-                  value={ex.duration || ''}
-                  placeholder="0"
-                  onChange={(e) => updateField(ex._id, 'duration', e.target.value)}
-                  className="w-12 text-center font-bold text-gray-700 outline-none"
-                />
-                <span className="text-xs font-bold text-gray-400">min</span>
+              {/* INPUT DURACIÓN */}
+              <div className="flex flex-col items-center gap-2">
+                <span className="text-[10px] font-black text-iron-accent uppercase tracking-widest">MIN</span>
+                <div className="bg-iron-800 border-2 border-iron-700 rounded-xl px-4 py-2 flex items-center gap-2">
+                   <Timer size={16} className="text-gray-500" />
+                   <input 
+                    type="number"
+                    value={ex.duration || ''}
+                    placeholder="0"
+                    onChange={(e) => updateField(ex._id, 'duration', e.target.value)}
+                    className="w-14 bg-transparent text-center font-black text-iron-100 outline-none text-xl"
+                  />
+                </div>
               </div>
             </div>
 
@@ -92,18 +94,17 @@ export const ActiveCardioSession = ({ exercises, onFinish, onCancel }: ActiveCar
 
         <button 
           onClick={handleFinish}
-          className="w-full mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md"
+          className="w-full mt-6 bg-iron-accent text-iron-900 font-black py-5 rounded-2xl flex items-center justify-center gap-3 transition-all transform hover:scale-[1.02] active:scale-95 shadow-xl uppercase tracking-widest"
         >
-          <CheckCircle2 size={24} />
-          FINALIZAR Y GUARDAR RUTA
+          <CheckCircle2 size={24} strokeWidth={3} />
+          Finalizar y Guardar Ruta
         </button>
 
-        {/* NUEVO: Botón Cancelar */}
         <button 
           onClick={onCancel}
-          className="w-full mt-2 text-red-400 hover:text-red-600 hover:bg-red-50 font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all"
+          className="w-full mt-2 text-red-500 hover:bg-red-500/10 font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all uppercase tracking-widest text-xs"
         >
-          <XCircle size={20} />
+          <XCircle size={18} />
           Cancelar Sesión
         </button>
       </div>

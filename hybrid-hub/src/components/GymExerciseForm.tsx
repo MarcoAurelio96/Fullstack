@@ -1,163 +1,116 @@
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { Dumbbell, PlusCircle } from "lucide-react";
 
 export const GymExerciseForm = () => {
   const { currentUser } = useAuth();
-
   const [name, setName] = useState("");
   const [bodyPart, setBodyPart] = useState("Pecho");
-  const [sets, setSets] = useState("");
-  const [reps, setReps] = useState("");
-  const [weight, setWeight] = useState("");
+  const [sets, setSets] = useState(3);
+  const [reps, setReps] = useState(10);
+  const [weight, setWeight] = useState(0);
 
-  
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const bodyParts = ["Pecho", "Biceps", "Triceps", "Espalda", "Hombro", "Pierna"];
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
-    setLoading(true);
+    const newWorkout = {
+      userEmail: currentUser?.email,
+      type: "Gym",
+      name,
+      bodyPart,
+      sets,
+      reps,
+      weight
+    };
 
     try {
       const response = await fetch("http://localhost:5000/api/workouts", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userEmail: currentUser?.email,
-          category: "Gym",
-          name: name,
-          bodyPart: bodyPart,
-          sets: Number(sets),
-          reps: Number(reps),
-          weight: Number(weight),
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newWorkout),
       });
-
-      if (!response.ok) {
-        throw new Error("Error al guardar en el servidor");
+      if (response.ok) {
+        window.location.reload();
       }
-
-      setSuccess("¡Ejercicio guardado con éxito! 💪");
-      
-      setName("");
-      setSets("");
-      setReps("");
-      setWeight("");
-      
-    } catch (err) {
-      setError("Hubo un problema al conectar con la base de datos.");
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      console.error("Error al guardar:", error);
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto w-full">
-      <div className="mb-6 px-4">
-        <h2 className="text-2xl font-bold text-gray-900">Ejercicios de Gimnasio</h2>
-        <p className="text-gray-500 mt-1">Crea y gestiona tus ejercicios</p>
+    <form onSubmit={handleSubmit} className="p-8 space-y-6">
+      <div className="text-center mb-6">
+        <div className="inline-flex p-3 rounded-xl bg-iron-900 text-iron-accent mb-3">
+          <Dumbbell size={32} />
+        </div>
+        <h3 className="text-2xl font-black text-iron-100 uppercase tracking-tight">Nuevo Ejercicio</h3>
       </div>
 
-      <div className="bg-white p-6 md:p-8 rounded-2xl border border-gray-200 shadow-sm">
-        <h3 className="text-lg font-bold text-gray-800 mb-6">Crear nuevo ejercicio</h3>
+      <div className="space-y-4">
+        <div>
+          <label className="block text-xs font-black text-iron-accent uppercase mb-2 ml-1">Nombre del Ejercicio</label>
+          <input 
+            type="text" 
+            required
+            placeholder="Ej: Press de Banca"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full bg-iron-900 border-2 border-iron-700 rounded-xl px-4 py-3 text-iron-100 outline-none focus:border-iron-accent transition-colors"
+          />
+        </div>
 
-        {/* Mensajes de feedback visuales */}
-        {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm font-medium">{error}</div>}
-        {success && <div className="bg-green-50 text-green-600 p-3 rounded-lg mb-4 text-sm font-medium">{success}</div>}
-
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Nombre del ejercicio</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Ej: Press de banca"
-              className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-              required
-            />
+            <label className="block text-xs font-black text-iron-accent uppercase mb-2 ml-1">Parte del Cuerpo</label>
+            <select 
+              value={bodyPart}
+              onChange={(e) => setBodyPart(e.target.value)}
+              className="w-full bg-iron-900 border-2 border-iron-700 rounded-xl px-4 py-3 text-iron-100 outline-none focus:border-iron-accent transition-colors appearance-none"
+            >
+              {bodyParts.map(part => <option key={part} value={part}>{part}</option>)}
+            </select>
           </div>
-
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Parte del cuerpo</label>
-            <div className="relative">
-              <select
-                value={bodyPart}
-                onChange={(e) => setBodyPart(e.target.value)}
-                className="w-full px-4 py-2.5 pr-10 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all appearance-none"
-              >
-                <option value="Pecho">Pecho</option>
-                <option value="Biceps">Bíceps</option>
-                <option value="Triceps">Tríceps</option>
-                <option value="Espalda">Espalda</option>
-                <option value="Hombro">Hombro</option>
-                <option value="Pierna">Pierna</option>
-              </select>
-              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" size={20} />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Series</label>
-              <input
-                type="number"
-                value={sets}
-                onChange={(e) => setSets(e.target.value)}
-                placeholder="4"
-                className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                required
-                min="1"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Repeticiones</label>
-              <input
-                type="number"
-                value={reps}
-                onChange={(e) => setReps(e.target.value)}
-                placeholder="12"
-                className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                required
-                min="1"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Peso (kg)</label>
-            <input
-              type="number"
+            <label className="block text-xs font-black text-iron-accent uppercase mb-2 ml-1">Peso Inicial (kg)</label>
+            <input 
+              type="number" 
               value={weight}
-              onChange={(e) => setWeight(e.target.value)}
-              placeholder="60"
-              className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-              required
-              min="0"
-              step="0.5"
+              onChange={(e) => setWeight(Number(e.target.value))}
+              className="w-full bg-iron-900 border-2 border-iron-700 rounded-xl px-4 py-3 text-iron-100 outline-none focus:border-iron-accent transition-colors"
             />
           </div>
+        </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-colors mt-2 flex justify-center items-center gap-2 disabled:bg-blue-400"
-          >
-            {/* Si está cargando, cambiamos el texto */}
-            {loading ? (
-              "Guardando..."
-            ) : (
-              <><span className="text-xl leading-none">+</span> Guardar ejercicio</>
-            )}
-          </button>
-        </form>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-black text-iron-accent uppercase mb-2 ml-1">Series</label>
+            <input 
+              type="number" 
+              value={sets}
+              onChange={(e) => setSets(Number(e.target.value))}
+              className="w-full bg-iron-900 border-2 border-iron-700 rounded-xl px-4 py-3 text-iron-100 outline-none focus:border-iron-accent transition-colors"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-black text-iron-accent uppercase mb-2 ml-1">Reps</label>
+            <input 
+              type="number" 
+              value={reps}
+              onChange={(e) => setReps(Number(e.target.value))}
+              className="w-full bg-iron-900 border-2 border-iron-700 rounded-xl px-4 py-3 text-iron-100 outline-none focus:border-iron-accent transition-colors"
+            />
+          </div>
+        </div>
       </div>
-    </div>
+
+      <button 
+        type="submit"
+        className="w-full bg-iron-accent text-iron-900 font-black py-4 rounded-xl flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-widest"
+      >
+        <PlusCircle size={20} />
+        Añadir a mi Biblioteca
+      </button>
+    </form>
   );
 };

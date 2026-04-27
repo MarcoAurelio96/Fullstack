@@ -1,28 +1,24 @@
 import { useState, useEffect } from "react";
-import { Search, Filter } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { CheckCircle2, Activity, Route } from "lucide-react";
 
-interface CardioTemplate {
+interface CardioExercise {
   _id: string;
   name: string;
   cardioType: string;
   distance: number;
   duration?: number;
-  pace?: number;
 }
 
 interface CardioSessionSelectorProps {
-  onSessionStart: (selectedSessions: CardioTemplate[]) => void;
+  onSessionStart: (exercises: CardioExercise[]) => void;
 }
 
 export const CardioSessionSelector = ({ onSessionStart }: CardioSessionSelectorProps) => {
   const { currentUser } = useAuth();
-  
-  const [sessions, setSessions] = useState<CardioTemplate[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [typeFilter, setTypeFilter] = useState("Todos");
+  const [library, setLibrary] = useState<CardioExercise[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [filterType, setFilterType] = useState("Todos");
 
   useEffect(() => {
     const fetchLibrary = async () => {
@@ -30,113 +26,95 @@ export const CardioSessionSelector = ({ onSessionStart }: CardioSessionSelectorP
         const response = await fetch(`http://localhost:5000/api/workouts?email=${currentUser?.email}`);
         if (response.ok) {
           const data = await response.json();
-          const cardioSessions = data.filter((w: any) => w.category === "Cardio");
-          setSessions(cardioSessions);
+          setLibrary(data.filter((ex: any) => ex.cardioType));
         }
       } catch (error) {
-        console.error("Error al cargar sesiones de cardio", error);
-      } finally {
-        setLoading(false);
+        console.error("Error al cargar rutas:", error);
       }
     };
     if (currentUser?.email) fetchLibrary();
   }, [currentUser]);
 
-  const filteredSessions = sessions.filter((sess) => {
-    const matchesSearch = sess.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = typeFilter === "Todos" || sess.cardioType === typeFilter;
-    return matchesSearch && matchesType;
-  });
-
-  const toggleSelection = (id: string) => {
-    setSelectedIds((prev) => 
-      prev.includes(id) ? prev.filter(selectedId => selectedId !== id) : [...prev, id]
-    );
+  const toggleExercise = (id: string) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
 
-  const handleCreateSession = () => {
-    const selectedSessions = sessions.filter(sess => selectedIds.includes(sess._id));
-    onSessionStart(selectedSessions);
+  const filteredLibrary = library.filter(ex => 
+    filterType === "Todos" || ex.cardioType?.toLowerCase() === filterType.toLowerCase()
+  );
+
+  const handleStart = () => {
+    const selected = library.filter(ex => selectedIds.includes(ex._id));
+    onSessionStart(selected);
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto flex flex-col h-[80vh]">
-      <div className="p-6 bg-white border-b border-gray-100 flex-shrink-0">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Selecciona tu ruta</h2>
-        
-        <div className="flex gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-            <input 
-              type="text" 
-              placeholder="Buscar sesión..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
-            />
-          </div>
+    <div className="p-6 bg-iron-800">
+      <h3 className="text-2xl font-black text-iron-100 uppercase tracking-tight mb-6 flex items-center gap-3">
+        <Activity className="text-iron-accent" /> Selecciona Tipo
+      </h3>
 
-          <div className="relative w-48">
-            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-            <select 
-              value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none appearance-none"
+      {/* FILTROS: Ajustado con padding lateral para alinear con las tarjetas de abajo */}
+      <div className="px-0.5 mb-6"> 
+        <div className="grid grid-cols-3 gap-3">
+          {["Todos", "Correr", "Andar"].map((type) => (
+            <button
+              key={type}
+              onClick={() => setFilterType(type)}
+              className={`py-3 rounded-xl text-xs font-black uppercase transition-all border-2 text-center ${
+                filterType === type 
+                  ? "bg-iron-accent border-iron-accent text-iron-900 shadow-[0_0_15px_rgba(255,211,105,0.2)]" 
+                  : "bg-iron-900 border-iron-700 text-gray-500 hover:border-gray-600"
+              }`}
             >
-              <option value="Todos">Todos</option>
-              <option value="Andar">Andar</option>
-              <option value="Correr">Correr</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="mt-4 p-3 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium flex items-center gap-2">
-          <span>💡</span> Si tu ruta no está en la lista, recuerda crearla desde la página principal.
+              {type}
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
-        {loading ? (
-          <p className="text-center text-gray-500">Cargando tu biblioteca...</p>
-        ) : filteredSessions.length === 0 ? (
-          <p className="text-center text-gray-500">No hay sesiones que coincidan.</p>
-        ) : (
-          <div className="space-y-3">
-            {filteredSessions.map((sess) => (
-              <label 
-                key={sess._id} 
-                className={`flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                  selectedIds.includes(sess._id) ? 'border-blue-500 bg-blue-50' : 'border-transparent bg-white shadow-sm hover:border-gray-200'
-                }`}
-              >
-                <input 
-                  type="checkbox" 
-                  checked={selectedIds.includes(sess._id)}
-                  onChange={() => toggleSelection(sess._id)}
-                  className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                />
-                <div className="ml-4 flex-1">
-                  <h4 className="font-bold text-gray-800">{sess.name}</h4>
-                  <p className="text-sm text-gray-500">
-                    {sess.cardioType === 'Andar' ? '🚶' : '🏃'} {sess.cardioType} • {sess.distance} km
-                    {sess.duration ? ` • ${sess.duration} min` : ''}
+      {/* LISTADO DE EJERCICIOS */}
+      <div className="max-h-[350px] overflow-y-auto space-y-3 pr-2 custom-scrollbar">
+        {filteredLibrary.length > 0 ? (
+          filteredLibrary.map(ex => (
+            <div 
+              key={ex._id}
+              onClick={() => toggleExercise(ex._id)}
+              className={`mx-0.5 p-4 rounded-xl cursor-pointer border-2 transition-all flex items-center justify-between ${
+                selectedIds.includes(ex._id) 
+                  ? "bg-iron-900 border-iron-accent" 
+                  : "bg-iron-900 border-iron-700 hover:border-gray-500"
+              }`}
+            >
+              <div className="flex items-center gap-4">
+                <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors ${
+                  selectedIds.includes(ex._id) ? "bg-iron-accent border-iron-accent" : "border-iron-700"
+                }`}>
+                  {selectedIds.includes(ex._id) && <CheckCircle2 size={16} className="text-iron-900" />}
+                </div>
+                <div>
+                  <p className="font-bold text-iron-100 uppercase text-sm">{ex.name}</p>
+                  <p className="text-[10px] text-gray-500 font-bold uppercase flex items-center gap-1 tracking-widest">
+                    <Route size={10}/> {ex.distance}km • {ex.cardioType}
                   </p>
                 </div>
-              </label>
-            ))}
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="mx-0.5 text-center py-10 border-2 border-dashed border-iron-700 rounded-2xl">
+            <p className="text-gray-500 font-bold uppercase text-xs">No hay rutas guardadas</p>
           </div>
         )}
       </div>
 
-      <div className="p-4 bg-white border-t border-gray-100 flex-shrink-0">
-        <button 
-          onClick={handleCreateSession}
-          disabled={selectedIds.length === 0}
-          className="w-full py-3.5 bg-blue-600 text-white font-bold rounded-xl disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-        >
-          Empezar sesión con {selectedIds.length} ruta(s)
-        </button>
-      </div>
+      <button 
+        onClick={handleStart}
+        disabled={selectedIds.length === 0}
+        className="w-full mt-6 bg-iron-accent text-iron-900 font-black py-4 rounded-xl flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-widest disabled:opacity-50"
+      >
+        Empezar Actividad ({selectedIds.length})
+      </button>
     </div>
   );
 };

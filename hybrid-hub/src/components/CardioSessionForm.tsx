@@ -1,169 +1,111 @@
 import { useState } from "react";
-// 1. Importamos el contexto
 import { useAuth } from "../context/AuthContext";
+import { Activity, PlusCircle } from "lucide-react";
 
 export const CardioSessionForm = () => {
-  const { currentUser } = useAuth(); // Necesitamos saber quién es
-
-  // Estados para el formulario
-  const [type, setType] = useState<"Andar" | "Correr">("Andar");
+  const { currentUser } = useAuth();
   const [name, setName] = useState("");
-  const [distance, setDistance] = useState("");
-  const [duration, setDuration] = useState(""); // Opcional
-  const [pace, setPace] = useState(""); // Opcional
+  const [cardioType, setCardioType] = useState("Correr");
+  const [distance, setDistance] = useState(0);
+  const [duration, setDuration] = useState(0);
 
-  // Estados para feedback
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
-    setLoading(true);
+    const newWorkout = {
+      userEmail: currentUser?.email,
+      type: "Cardio",
+      name,
+      cardioType,
+      distance,
+      duration
+    };
 
     try {
-      // 2. Hacemos el POST al Backend
       const response = await fetch("http://localhost:5000/api/workouts", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userEmail: currentUser?.email,
-          category: "Cardio", // Le decimos a MongoDB que esto es Cardio
-          name: name,
-          cardioType: type, // "Andar" o "Correr"
-          distance: Number(distance),
-          // Si el usuario no puso nada, enviamos 'undefined' para que MongoDB no se queje
-          duration: duration ? Number(duration) : undefined,
-          pace: pace ? Number(pace) : undefined,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newWorkout),
       });
-
-      if (!response.ok) {
-        throw new Error("Error al guardar en el servidor");
+      if (response.ok) {
+        window.location.reload();
       }
-
-      setSuccess("¡Sesión de cardio guardada a tope! 🏃‍♂️💨");
-      
-      // Limpiamos los campos para dejarlo bonito
-      setName("");
-      setDistance("");
-      setDuration("");
-      setPace("");
-      
-    } catch (err) {
-      setError("Hubo un problema al conectar con la base de datos.");
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      console.error("Error al guardar:", error);
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto w-full">
-      <div className="bg-white p-6 md:p-8 rounded-2xl border border-gray-200 shadow-sm">
-        <h3 className="text-lg font-bold text-gray-800 mb-6">Crear nueva sesión</h3>
-
-        {/* Mensajes de feedback */}
-        {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm font-medium">{error}</div>}
-        {success && <div className="bg-green-50 text-green-600 p-3 rounded-lg mb-4 text-sm font-medium">{success}</div>}
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          
-          <div className="grid grid-cols-2 gap-4 mb-2">
-            <button
-              type="button"
-              onClick={() => setType("Andar")}
-              className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all ${
-                type === "Andar" 
-                  ? "border-blue-500 bg-blue-50 text-blue-700" 
-                  : "border-gray-200 hover:border-blue-200 bg-white"
-              }`}
-            >
-              <span className="text-3xl mb-2">🚶</span>
-              <span className="font-semibold text-sm">Andar</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setType("Correr")}
-              className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all ${
-                type === "Correr" 
-                  ? "border-blue-500 bg-blue-50 text-blue-700" 
-                  : "border-gray-200 hover:border-blue-200 bg-white"
-              }`}
-            >
-              <span className="text-3xl mb-2">🏃</span>
-              <span className="font-semibold text-sm">Correr</span>
-            </button>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Nombre de la sesión</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Ej: Correr post entreno"
-              className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Distancia (km)</label>
-            <input
-              type="number"
-              value={distance}
-              onChange={(e) => setDistance(e.target.value)}
-              placeholder="5.0"
-              className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-              required
-              min="0.1"
-              step="0.1"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Duración (minutos)</label>
-            <input
-              type="number"
-              value={duration}
-              onChange={(e) => setDuration(e.target.value)}
-              placeholder="30"
-              className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-              min="1"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Ritmo (min/km)</label>
-            <input
-              type="number"
-              value={pace}
-              onChange={(e) => setPace(e.target.value)}
-              placeholder="6.0"
-              className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-              min="1"
-              step="0.1"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-colors mt-2 flex justify-center items-center gap-2 disabled:bg-blue-400"
-          >
-            {loading ? (
-              "Guardando..."
-            ) : (
-              <><span className="text-xl leading-none">+</span> Guardar sesión</>
-            )}
-          </button>
-        </form>
+    <form onSubmit={handleSubmit} className="p-8 space-y-6">
+      <div className="text-center mb-6">
+        <div className="inline-flex p-3 rounded-xl bg-iron-900 text-iron-accent mb-3">
+          <Activity size={32} />
+        </div>
+        <h3 className="text-2xl font-black text-iron-100 uppercase tracking-tight">Nueva Ruta</h3>
       </div>
-    </div>
+
+      <div className="space-y-4">
+        <div>
+          <label className="block text-xs font-black text-iron-accent uppercase mb-2 ml-1">Nombre de la Ruta</label>
+          <input 
+            type="text" 
+            required
+            placeholder="Ej: Paseo por el parque"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full bg-iron-900 border-2 border-iron-700 rounded-xl px-4 py-3 text-iron-100 outline-none focus:border-iron-accent transition-colors"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-black text-iron-accent uppercase mb-2 ml-1">Tipo de Actividad</label>
+          <div className="flex gap-4">
+            {["Correr", "Andar"].map(type => (
+              <button
+                key={type}
+                type="button"
+                onClick={() => setCardioType(type)}
+                className={`flex-1 py-3 rounded-xl font-bold border-2 transition-all ${
+                  cardioType === type 
+                    ? 'bg-iron-accent border-iron-accent text-iron-900' 
+                    : 'bg-iron-900 border-iron-700 text-gray-400 hover:border-gray-500'
+                }`}
+              >
+                {type}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-black text-iron-accent uppercase mb-2 ml-1">Distancia (km)</label>
+            <input 
+              type="number" 
+              step="0.1"
+              value={distance}
+              onChange={(e) => setDistance(Number(e.target.value))}
+              className="w-full bg-iron-900 border-2 border-iron-700 rounded-xl px-4 py-3 text-iron-100 outline-none focus:border-iron-accent transition-colors"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-black text-iron-accent uppercase mb-2 ml-1">Duración (min)</label>
+            <input 
+              type="number" 
+              value={duration}
+              onChange={(e) => setDuration(Number(e.target.value))}
+              className="w-full bg-iron-900 border-2 border-iron-700 rounded-xl px-4 py-3 text-iron-100 outline-none focus:border-iron-accent transition-colors"
+            />
+          </div>
+        </div>
+      </div>
+
+      <button 
+        type="submit"
+        className="w-full bg-iron-accent text-iron-900 font-black py-4 rounded-xl flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-widest"
+      >
+        <PlusCircle size={20} />
+        Guardar en Biblioteca
+      </button>
+    </form>
   );
 };

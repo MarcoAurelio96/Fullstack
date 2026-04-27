@@ -6,7 +6,6 @@ export const getSessions = async (req, res) => {
     const { email } = req.query;
     if (!email) return res.status(400).json({ error: "Falta el email del usuario" });
 
-    // Buscamos las sesiones y las ordenamos de más nueva a más antigua
     const sessions = await Session.find({ userEmail: email }).sort({ date: -1 });
     res.status(200).json(sessions);
   } catch (error) {
