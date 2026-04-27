@@ -14,15 +14,24 @@ export const GymExerciseForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newWorkout = {
-      userEmail: currentUser?.email,
+
+    if (!currentUser?.email) {
+      alert("Error: No se detecta el usuario. Por favor, inicia sesión de nuevo.");
+      return;
+    }
+
+ const newWorkout = {
+      userEmail: currentUser.email,
       type: "Gym",
-      name,
-      bodyPart,
-      sets,
-      reps,
-      weight
+      category: "Gym",
+      name: name,
+      bodyPart: bodyPart,
+      sets: Number(sets),
+      reps: Number(reps),
+      weight: Number(weight)
     };
+
+    console.log("📤 Enviando ejercicio:", newWorkout);
 
     try {
       const response = await fetch("http://localhost:5000/api/workouts", {
@@ -30,11 +39,18 @@ export const GymExerciseForm = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newWorkout),
       });
+
       if (response.ok) {
+        console.log("✅ Guardado con éxito");
         window.location.reload();
+      } else {
+        const errorData = await response.json();
+        console.error("❌ Error del servidor:", errorData);
+        alert("El servidor rechazó el ejercicio. Revisa los datos.");
       }
     } catch (error) {
-      console.error("Error al guardar:", error);
+      console.error("❌ Error de red:", error);
+      alert("No se pudo conectar con el servidor.");
     }
   };
 
@@ -106,7 +122,8 @@ export const GymExerciseForm = () => {
 
       <button 
         type="submit"
-        className="w-full bg-iron-accent text-iron-900 font-black py-4 rounded-xl flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-widest"
+        disabled={!currentUser?.email} // Desactivamos si no hay usuario
+        className="w-full bg-iron-accent text-iron-900 font-black py-4 rounded-xl flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-widest disabled:opacity-50"
       >
         <PlusCircle size={20} />
         Añadir a mi Biblioteca

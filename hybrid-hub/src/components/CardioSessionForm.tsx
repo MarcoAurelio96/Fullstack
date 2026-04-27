@@ -11,13 +11,20 @@ export const CardioSessionForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!currentUser?.email) {
+      alert("Error: No se detecta el usuario activo.");
+      return;
+    }
+
     const newWorkout = {
-      userEmail: currentUser?.email,
+      userEmail: currentUser.email,
       type: "Cardio",
+      category: "Cardio",
       name,
       cardioType,
-      distance,
-      duration
+      distance: Number(distance),
+      duration: Number(duration)
     };
 
     try {
@@ -26,8 +33,13 @@ export const CardioSessionForm = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newWorkout),
       });
+
       if (response.ok) {
         window.location.reload();
+      } else {
+        const errorData = await response.json();
+        console.error("Error del servidor:", errorData);
+        alert(`Error al guardar: ${errorData.message}`);
       }
     } catch (error) {
       console.error("Error al guardar:", error);
@@ -101,7 +113,8 @@ export const CardioSessionForm = () => {
 
       <button 
         type="submit"
-        className="w-full bg-iron-accent text-iron-900 font-black py-4 rounded-xl flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-widest"
+        disabled={!currentUser?.email}
+        className="w-full bg-iron-accent text-iron-900 font-black py-4 rounded-xl flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-widest disabled:opacity-50"
       >
         <PlusCircle size={20} />
         Guardar en Biblioteca
