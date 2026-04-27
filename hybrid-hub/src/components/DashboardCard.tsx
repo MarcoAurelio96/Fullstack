@@ -7,15 +7,14 @@ interface DashboardCardProps {
   children: React.ReactNode;
 }
 
-export const DashboardCard: React.FC<DashboardCardProps> = ({ title, subtitle, children }) => {
+export const DashboardCard = ({ title, subtitle, children }: DashboardCardProps) => {
   return (
-    <div className="bg-white p-8 rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center gap-6">
-      <div className="text-center">
-        <h3 className="text-2xl font-bold text-gray-800">{title}</h3>
-        {subtitle && <p className="text-gray-500 mt-1">{subtitle}</p>}
+    <div className="w-full bg-iron-800 rounded-none sm:rounded-2xl p-8 transition-all">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-iron-100">{title}</h2>
+        {subtitle && <p className="text-gray-400 mt-1 font-medium">{subtitle}</p>}
       </div>
-      {/* Aquí renderizamos lo que le pasemos por dentro */}
-      <div className="w-full flex justify-center gap-8">
+      <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
         {children}
       </div>
     </div>

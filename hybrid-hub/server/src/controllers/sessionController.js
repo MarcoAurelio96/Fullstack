@@ -36,3 +36,15 @@ export const saveSession = async (req, res) => {
     res.status(400).json({ error: "Error al guardar la sesión en el historial" });
   }
 };
+
+// DELETE: Borrar una sesión específica
+export const deleteSession = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Session.findByIdAndDelete(id);
+    res.status(200).json({ message: "Sesión eliminada correctamente" });
+  } catch (error) {
+    console.error("❌ Error al borrar sesión:", error.message);
+    res.status(500).json({ error: "Error al eliminar la sesión" });
+  }
+};

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckCircle2, ChevronRight, Timer, Route } from "lucide-react";
+import { CheckCircle2, ChevronRight, Timer, Route, XCircle } from "lucide-react";
 import confetti from "canvas-confetti";
 
 interface CardioExercise {
@@ -13,9 +13,10 @@ interface CardioExercise {
 interface ActiveCardioSessionProps {
   exercises: CardioExercise[];
   onFinish: (finalExercises: CardioExercise[]) => void;
+  onCancel: () => void; // NUEVO
 }
 
-export const ActiveCardioSession = ({ exercises, onFinish }: ActiveCardioSessionProps) => {
+export const ActiveCardioSession = ({ exercises, onFinish, onCancel }: ActiveCardioSessionProps) => {
   const [sessionExercises, setSessionExercises] = useState(exercises);
 
   const updateField = (id: string, field: 'distance' | 'duration', value: string) => {
@@ -61,7 +62,6 @@ export const ActiveCardioSession = ({ exercises, onFinish }: ActiveCardioSession
             </div>
 
             <div className="flex items-center gap-4 self-end md:self-auto">
-              {/* Input Distancia */}
               <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500 transition-all">
                 <Route size={16} className="text-gray-400" />
                 <input 
@@ -74,7 +74,6 @@ export const ActiveCardioSession = ({ exercises, onFinish }: ActiveCardioSession
                 <span className="text-xs font-bold text-gray-400">km</span>
               </div>
 
-              {/* Input Duración */}
               <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500 transition-all">
                 <Timer size={16} className="text-gray-400" />
                 <input 
@@ -97,6 +96,15 @@ export const ActiveCardioSession = ({ exercises, onFinish }: ActiveCardioSession
         >
           <CheckCircle2 size={24} />
           FINALIZAR Y GUARDAR RUTA
+        </button>
+
+        {/* NUEVO: Botón Cancelar */}
+        <button 
+          onClick={onCancel}
+          className="w-full mt-2 text-red-400 hover:text-red-600 hover:bg-red-50 font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all"
+        >
+          <XCircle size={20} />
+          Cancelar Sesión
         </button>
       </div>
     </div>

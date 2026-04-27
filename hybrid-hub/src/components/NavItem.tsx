@@ -6,14 +6,19 @@ interface NavItemProps {
   isActive?: boolean;
 }
 
-export const NavItem: React.FC<NavItemProps> = ({ icon, label, isActive = false }) => {
+export const NavItem = ({ icon, label, isActive }: NavItemProps) => {
   return (
-    <div className={`flex flex-col items-center gap-1.5 p-3 rounded-xl transition-colors cursor-pointer 
-      ${isActive ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600 hover:bg-gray-100'}`}>
-      <div className={`text-2xl ${isActive ? 'text-blue-600' : 'text-gray-400'}`}>
+    <div 
+      className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-200 ${
+        isActive 
+          ? 'text-iron-accent bg-iron-900/50' // Activo: Amarillo y fondo ligeramente oscurecido
+          : 'text-gray-400 hover:text-iron-100 hover:bg-iron-900/30' // Inactivo: Gris, hover a blanco
+      }`}
+    >
+      <div className={`${isActive ? 'scale-110' : 'scale-100'} transition-transform`}>
         {icon}
       </div>
-      <span className="text-sm">{label}</span>
+      <span className="text-xs font-semibold mt-1">{label}</span>
     </div>
   );
 };

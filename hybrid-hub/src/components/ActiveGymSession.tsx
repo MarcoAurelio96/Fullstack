@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-// Importamos los nuevos iconos (Trash2 y PlusCircle)
-import { CheckCircle2, ChevronRight, Weight, Trash2, PlusCircle } from "lucide-react";
+import { CheckCircle2, ChevronRight, Weight, Trash2, PlusCircle, XCircle } from "lucide-react";
 import confetti from "canvas-confetti";
 
 interface Exercise {
@@ -15,13 +14,13 @@ interface Exercise {
 interface ActiveGymSessionProps {
   exercises: Exercise[];
   onFinish: (finalExercises: Exercise[]) => void;
-  onAddExercise: () => void; // NUEVO: Función para abrir el modal de añadir
+  onAddExercise: () => void;
+  onCancel: () => void; // NUEVO
 }
 
-export const ActiveGymSession = ({ exercises, onFinish, onAddExercise }: ActiveGymSessionProps) => {
+export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel }: ActiveGymSessionProps) => {
   const [sessionExercises, setSessionExercises] = useState(exercises);
 
-  // NUEVO: Sincronizamos el estado local si el Dashboard nos inyecta ejercicios nuevos
   useEffect(() => {
     setSessionExercises(exercises);
   }, [exercises]);
@@ -32,13 +31,12 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise }: ActiveG
     );
   };
 
-  // NUEVO: Función para eliminar un ejercicio de la lista
   const removeExercise = (id: string) => {
     setSessionExercises(prev => prev.filter(ex => ex._id !== id));
   };
 
   const handleFinish = () => {
-    if (sessionExercises.length === 0) return; // Evitar que finalice una sesión vacía
+    if (sessionExercises.length === 0) return;
     
     confetti({
       particleCount: 150,
@@ -78,7 +76,6 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise }: ActiveG
               </div>
 
               <div className="flex items-center gap-3">
-                {/* Input de Peso Editable */}
                 <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500 transition-all">
                   <Weight size={16} className="text-gray-400" />
                   <input 
@@ -90,7 +87,6 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise }: ActiveG
                   <span className="text-xs font-bold text-gray-400">kg</span>
                 </div>
 
-                {/* NUEVO: Botón de Eliminar (Papelera) */}
                 <button 
                   onClick={() => removeExercise(ex._id)}
                   className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
@@ -103,7 +99,6 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise }: ActiveG
           ))
         )}
 
-        {/* NUEVO: Botón para añadir un ejercicio extra */}
         <button 
           onClick={onAddExercise}
           className="w-full py-3.5 mt-2 border-2 border-dashed border-gray-300 text-gray-500 hover:text-blue-600 hover:border-blue-400 hover:bg-blue-50 font-semibold rounded-xl flex items-center justify-center gap-2 transition-all"
@@ -119,6 +114,15 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise }: ActiveG
         >
           <CheckCircle2 size={24} />
           FINALIZAR Y GUARDAR SESIÓN
+        </button>
+
+        {/* NUEVO: Botón Cancelar */}
+        <button 
+          onClick={onCancel}
+          className="w-full mt-2 text-red-400 hover:text-red-600 hover:bg-red-50 font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all"
+        >
+          <XCircle size={20} />
+          Cancelar Sesión
         </button>
       </div>
     </div>
