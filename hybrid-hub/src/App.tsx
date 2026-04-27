@@ -1,14 +1,14 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Register } from "./pages/register";
 import { Dashboard } from "./pages/Dashboard";
-import { Login } from "./pages/Login"; // <-- AÑADIMOS ESTO
+import { Login } from "./pages/Login";
 import { useAuth } from "./context/AuthContext";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { currentUser, loading } = useAuth();
   
   if (loading) return <div className="h-screen flex items-center justify-center">Cargando...</div>;
-  if (!currentUser) return <Navigate to="/login" />; // <-- AHORA MANDAMOS AL LOGIN SI NO ESTÁ AUTENTICADO
+  if (!currentUser) return <Navigate to="/login" />;
   
   return <>{children}</>;
 };
