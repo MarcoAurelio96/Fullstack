@@ -3,7 +3,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../config/firebase";
 import { useAuth } from "../context/AuthContext";
 
-import { Home, Dumbbell, Activity, Calendar, Plus, User } from "lucide-react";
+import { Home, Dumbbell, Activity, Calendar, Plus, User, DumbbellIcon } from "lucide-react";
 
 import { DashboardCard } from "../components/DashboardCard";
 import { NavItem } from "../components/NavItem";
@@ -104,7 +104,7 @@ export const Dashboard = () => {
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           
           <div className="flex items-center gap-2 text-iron-accent">
-            <Activity size={32} strokeWidth={3} />
+            <Dumbbell size={32} strokeWidth={1} />
             <h1 className="text-2xl font-extrabold text-iron-100 tracking-tight uppercase">Iron Pace</h1>
           </div>
           
