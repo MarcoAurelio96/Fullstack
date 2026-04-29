@@ -8,9 +8,10 @@ export const Profile = () => {
   const [totalSessions, setTotalSessions] = useState(0);
   const [gymSessions, setGymSessions] = useState(0);
   const [cardioSessions, setCardioSessions] = useState(0);
+  const [daysSinceLast, setDaysSinceLast] = useState<number | null>(null);
 
-  const [weight, setWeight] = useState(90); // kg
-  const [height, setHeight] = useState(180); // cm
+  const [weight, setWeight] = useState(90);
+  const [height, setHeight] = useState(180);
   const [age, setAge] = useState(28);
   const [gender, setGender] = useState("Hombre");
   const [isEditing, setIsEditing] = useState(false);
@@ -61,6 +62,22 @@ export const Profile = () => {
         setGymSessions(gymCount);
         setCardioSessions(cardioCount);
         setTotalSessions(sessions.length);
+
+        if (sessions.length > 0) {
+          const mostRecent = sessions.reduce((latest: any, current: any) => {
+            const currentDate = new Date(current.createdAt || current.date);
+            const latestDate = new Date(latest.createdAt || latest.date);
+            return currentDate > latestDate ? current : latest;
+          });
+
+          const lastDate = new Date(mostRecent.createdAt || mostRecent.date);
+          const today = new Date();
+          
+          const diffTime = Math.abs(today.getTime() - lastDate.getTime());
+          const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+          
+          setDaysSinceLast(diffDays);
+        }
       } catch (error) {
         console.error("Error cargando estadísticas:", error);
       }
@@ -124,7 +141,6 @@ export const Profile = () => {
         {/* Columna Izquierda: Datos e IMC Editables */}
         <div className="bg-iron-800 rounded-3xl border-2 border-iron-700 p-6 shadow-xl relative">
           
-          {/* BOTÓN DE AJUSTES */}
           <button 
             onClick={() => setIsEditing(!isEditing)}
             className="absolute top-4 right-4 text-gray-500 hover:text-iron-accent transition-colors"
@@ -135,7 +151,6 @@ export const Profile = () => {
           <h3 className="text-iron-accent font-black uppercase text-xs tracking-widest mb-6">Datos del Atleta</h3>
 
           <div className="space-y-4 mb-8">
-            {/* EDAD */}
             <div className="flex justify-between items-center border-b border-iron-700 pb-2">
               <span className="text-gray-500 font-black uppercase text-[10px]">Edad:</span>
               {isEditing ? (
@@ -150,7 +165,6 @@ export const Profile = () => {
               )}
             </div>
 
-            {/* GÉNERO */}
             <div className="flex justify-between items-center border-b border-iron-700 pb-2">
               <span className="text-gray-500 font-black uppercase text-[10px]">Género:</span>
               {isEditing ? (
@@ -168,7 +182,6 @@ export const Profile = () => {
               )}
             </div>
 
-            {/* ALTURA */}
             <div className="flex justify-between items-center border-b border-iron-700 pb-2">
               <span className="text-gray-500 font-black uppercase text-[10px]">Altura (cm):</span>
               {isEditing ? (
@@ -183,7 +196,6 @@ export const Profile = () => {
               )}
             </div>
 
-            {/* PESO */}
             <div className="flex justify-between items-center border-b border-iron-700 pb-2">
               <span className="text-gray-500 font-black uppercase text-[10px]">Peso (kg):</span>
               {isEditing ? (
@@ -208,7 +220,6 @@ export const Profile = () => {
             )}
           </div>
 
-          {/* Tarjeta IMC */}
           <div className="bg-iron-900 rounded-2xl p-6 border-2 border-iron-700 text-center">
             <h4 className="text-iron-accent font-black uppercase text-xs tracking-widest mb-2">Tu IMC Actual</h4>
             <div className="text-4xl font-black text-iron-100 mb-1">{bmi}</div>
@@ -219,29 +230,42 @@ export const Profile = () => {
         </div>
 
         {/* Columna Derecha: Desglose Gym vs Cardio */}
-        <div className="bg-iron-800 rounded-3xl border-2 border-iron-700 p-6 shadow-xl flex flex-col">
-          <h4 className="text-center text-iron-accent font-black uppercase text-xs tracking-[0.2em] mb-8">
-            Desglose de Entrenamientos
-          </h4>
+        <div className="bg-iron-800 rounded-3xl border-2 border-iron-700 p-6 shadow-xl flex flex-col justify-between">
+          <div>
+            <h4 className="text-center text-iron-accent font-black uppercase text-xs tracking-[0.2em] mb-8">
+              Desglose de Entrenamientos
+            </h4>
 
-          <div className="grid grid-cols-2 gap-4 flex-grow">
-            <div className="bg-iron-900 rounded-2xl p-4 border-2 border-iron-700 flex flex-col items-center justify-center text-center transition-colors hover:border-iron-accent/30">
-              <Dumbbell size={32} className="text-iron-accent mb-3" />
-              <div className="text-4xl font-black text-iron-100">{gymSessions}</div>
-              <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-2">Sesiones Gym</div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-iron-900 rounded-2xl p-4 border-2 border-iron-700 flex flex-col items-center justify-center text-center">
+                <Dumbbell size={32} className="text-iron-accent mb-3" />
+                <div className="text-4xl font-black text-iron-100">{gymSessions}</div>
+                <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-2">Sesiones Gym</div>
+              </div>
+              
+              <div className="bg-iron-900 rounded-2xl p-4 border-2 border-iron-700 flex flex-col items-center justify-center text-center">
+                <Activity size={32} className="text-iron-accent mb-3" />
+                <div className="text-4xl font-black text-iron-100">{cardioSessions}</div>
+                <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-2">Sesiones Cardio</div>
+              </div>
             </div>
-            
-            <div className="bg-iron-900 rounded-2xl p-4 border-2 border-iron-700 flex flex-col items-center justify-center text-center transition-colors hover:border-iron-accent/30">
-              <Activity size={32} className="text-iron-accent mb-3" />
-              <div className="text-4xl font-black text-iron-100">{cardioSessions}</div>
-              <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-2">Sesiones Cardio</div>
-            </div>
+          </div>
+
+          {/* Texto dinámico de última sesión */}
+          <div className="mt-8 pt-4 border-t border-iron-700 text-center">
+            <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">
+              {daysSinceLast === null 
+                ? "Sin sesiones registradas aún" 
+                : daysSinceLast === 0 
+                  ? "Última sesión: Hoy 🔥" 
+                  : `Última sesión hace ${daysSinceLast} ${daysSinceLast === 1 ? 'día' : 'días'}`}
+            </span>
           </div>
         </div>
         
       </div>
 
-      {/* Input oculto para subir la imagen */}
+    
       <input 
         type="file" 
         ref={fileInputRef} 
