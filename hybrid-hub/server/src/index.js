@@ -9,9 +9,11 @@ import sessionRoutes from './routes/sessionRoutes.js';
 dotenv.config();
 
 const app = express();
+const userRoutes = require('./routes/userRoutes');
 
 app.use(cors());
 app.use(express.json());
+app.use('/api/users', userRoutes);
 
 // Rutas
 app.use('/api/workouts', workoutRoutes); 
