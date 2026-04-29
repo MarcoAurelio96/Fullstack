@@ -28,7 +28,7 @@ export const CardioSessionForm = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:5000/api/workouts", {
+      const response = await fetch("/api/workouts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newWorkout),

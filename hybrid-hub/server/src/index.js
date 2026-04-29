@@ -17,9 +17,14 @@ app.use(express.json());
 app.use('/api/workouts', workoutRoutes); 
 app.use('/api/sessions', sessionRoutes);
 
+connectDB();
+
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, async () => {
-  await connectDB();
-  console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
+  });
+}
+
+export default app;

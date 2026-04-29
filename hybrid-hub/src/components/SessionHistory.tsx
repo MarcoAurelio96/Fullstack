@@ -30,7 +30,7 @@ export const SessionHistory = () => {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/sessions?email=${currentUser?.email}`);
+        const response = await fetch(`/api/sessions?email=${currentUser?.email}`);
         if (response.ok) {
           const data = await response.json();
           setSessions(data);
@@ -50,7 +50,7 @@ export const SessionHistory = () => {
     
     if (confirmDelete) {
       try {
-        const response = await fetch(`http://localhost:5000/api/sessions/${id}`, {
+        const response = await fetch(`/api/sessions/${id}`, {
           method: "DELETE",
         });
 

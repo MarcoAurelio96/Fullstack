@@ -23,7 +23,7 @@ export const CardioSessionSelector = ({ onSessionStart }: CardioSessionSelectorP
   useEffect(() => {
     const fetchLibrary = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/workouts?email=${currentUser?.email}`);
+        const response = await fetch(`/api/workouts?email=${currentUser?.email}`);
         if (response.ok) {
           const data = await response.json();
           setLibrary(data.filter((ex: any) => ex.cardioType));

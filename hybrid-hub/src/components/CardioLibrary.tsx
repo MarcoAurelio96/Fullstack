@@ -27,7 +27,7 @@ export const CardioLibrary = () => {
 
   const fetchExercises = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/workouts?email=${currentUser?.email}`);
+      const response = await fetch(`/api/workouts?email=${currentUser?.email}`);
       if (response.ok) {
         const data = await response.json();
         setExercises(data.filter((ex: any) => ex.cardioType));
@@ -41,7 +41,7 @@ export const CardioLibrary = () => {
 
   const handleSave = async (id: string) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/workouts/${id}`, {
+      const response = await fetch(`/api/workouts/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ distance: editDist, duration: editDur }),
@@ -61,7 +61,7 @@ export const CardioLibrary = () => {
     
     if (isConfirmed) {
       try {
-        const response = await fetch(`http://localhost:5000/api/workouts/${id}`, {
+        const response = await fetch(`/api/workouts/${id}`, {
           method: "DELETE",
         });
 

@@ -18,7 +18,7 @@ export const WorkoutList = () => {
   useEffect(() => {
     const fetchWorkouts = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/workouts?email=${currentUser?.email}`);
+        const response = await fetch(`/api/workouts?email=${currentUser?.email}`);
         
         if (!response.ok) throw new Error("Error al cargar los datos");
         
