@@ -54,7 +54,7 @@ export const WorkoutList = () => {
                 {workout.type === "Fuerza" && "🏋️‍♂️"} {workout.type}
               </p>
               <p className="text-sm text-gray-500">
-                {new Date(workout.createdAt).toLocaleDateString()} {/* Formateamos la fecha */}
+                {new Date(workout.createdAt).toLocaleDateString()}
               </p>
             </div>
             <div className="text-right">

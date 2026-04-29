@@ -94,7 +94,6 @@ export const SessionHistory = () => {
       
       {/* Cabecera y Filtros */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-        {/* CORREGIDO: Texto claro (iron-100) e icono dorado (iron-accent) */}
         <h2 className="text-2xl font-bold text-iron-100 flex items-center gap-3 uppercase tracking-tight">
           <CalendarDays className="text-iron-accent" size={28} /> 
           Tu Historial

@@ -21,7 +21,7 @@ export const createWorkout = async (req, res) => {
     const savedWorkout = await newWorkout.save();
     res.status(201).json(savedWorkout);
   } catch (error) {
-    console.error("❌ Error al guardar:", error.message); // Por si falla, lo veremos en la terminal
+    console.error("❌ Error al guardar:", error.message);
     res.status(400).json({ error: "Error al guardar el entrenamiento", detalle: error.message });
   }
 };

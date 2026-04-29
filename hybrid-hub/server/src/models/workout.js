@@ -31,8 +31,8 @@ const workoutSchema = new mongoose.Schema({
     required: false,
   },
   distance: { type: Number, required: false },
-  duration: { type: Number, required: false }, // Lo hacemos opcional como pediste
-  pace: { type: Number, required: false },     // Ritmo opcional
+  duration: { type: Number, required: false },
+  pace: { type: Number, required: false },
 
   date: {
     type: Date,

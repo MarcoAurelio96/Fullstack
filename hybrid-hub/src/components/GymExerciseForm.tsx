@@ -122,7 +122,7 @@ export const GymExerciseForm = () => {
 
       <button 
         type="submit"
-        disabled={!currentUser?.email} // Desactivamos si no hay usuario
+        disabled={!currentUser?.email}
         className="w-full bg-iron-accent text-iron-900 font-black py-4 rounded-xl flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-widest disabled:opacity-50"
       >
         <PlusCircle size={20} />
