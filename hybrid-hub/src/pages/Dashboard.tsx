@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../config/firebase";
 import { useAuth } from "../context/AuthContext";
 
-import { Home, Dumbbell, Activity, Calendar, Plus, User } from "lucide-react";
+import { Home, Dumbbell, Activity, Calendar, Plus, User, Loader2, CheckCircle2 } from "lucide-react"; // 2. Añadimos iconos nuevos
 
 import { DashboardCard } from "../components/DashboardCard";
 import { NavItem } from "../components/NavItem";
@@ -33,6 +33,61 @@ export const Dashboard = () => {
   
   const [activeSession, setActiveSession] = useState<any>(null);
   const [activeSessionType, setActiveSessionType] = useState<"Gym" | "Cardio" | null>(null);
+
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [isCheckingUser, setIsCheckingUser] = useState(true);
+  const [isSavingOnboarding, setIsSavingOnboarding] = useState(false);
+  
+  const [age, setAge] = useState<number | "">("");
+  const [gender, setGender] = useState("Hombre");
+  const [height, setHeight] = useState<number | "">("");
+  const [weight, setWeight] = useState<number | "">("");
+
+  useEffect(() => {
+    const checkUserStatus = async () => {
+      if (!currentUser?.email) return;
+
+      try {
+        const response = await fetch(`/api/users?email=${currentUser.email}`);
+        if (response.status === 404) {
+          setShowOnboarding(true);
+        }
+      } catch (error) {
+        console.error("Error al verificar usuario:", error);
+      } finally {
+        setIsCheckingUser(false);
+      }
+    };
+
+    checkUserStatus();
+  }, [currentUser]);
+
+  const handleOnboardingSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!age || !height || !weight) return alert("Rellena todos los campos");
+
+    setIsSavingOnboarding(true);
+    try {
+      await fetch("/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: currentUser?.email,
+          name: currentUser?.displayName,
+          age: Number(age),
+          gender,
+          height: Number(height),
+          weight: Number(weight),
+        }),
+      });
+      setShowOnboarding(false);
+    } catch (error) {
+      console.error("Error al guardar onboarding:", error);
+      alert("Error al guardar los datos.");
+    } finally {
+      setIsSavingOnboarding(false);
+    }
+  };
 
   const openModal = (type: ModalType) => {
     setModalType(type);
@@ -74,13 +129,10 @@ export const Dashboard = () => {
           exercises: finalData
         }),
       });
-
       if (!response.ok) throw new Error("Error al guardar la sesión");
-
-      console.log("¡Sesión guardada en la base de datos con éxito! 🎉");
-      
+      console.log("¡Sesión guardada con éxito! 🎉");
     } catch (error) {
-      console.error("Hubo un problema al guardar el historial:", error);
+      console.error("Error:", error);
     } finally {
       setTimeout(() => {
         setActiveSession(null);
@@ -97,12 +149,70 @@ export const Dashboard = () => {
     }
   };
 
+  if (isCheckingUser) {
+    return (
+      <div className="min-h-screen bg-iron-900 flex items-center justify-center">
+        <Loader2 className="text-iron-accent animate-spin" size={40} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-iron-900 flex flex-col font-sans selection:bg-iron-accent selection:text-iron-900">
       
+      {showOnboarding && (
+        <div className="fixed inset-0 bg-iron-900/95 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-iron-800 w-full max-w-md rounded-3xl border-4 border-iron-900 p-8 shadow-2xl animate-in zoom-in duration-300">
+            <div className="text-center mb-8">
+              <div className="bg-iron-900 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-iron-accent">
+                <User size={40} className="text-iron-accent" />
+              </div>
+              <h2 className="text-2xl font-black text-iron-100 uppercase tracking-tighter">Bienvenido, {currentUser?.displayName?.split(' ')[0]}</h2>
+              <p className="text-gray-500 text-xs font-bold uppercase mt-2 tracking-widest">Completa tu perfil de atleta</p>
+            </div>
+
+            <form onSubmit={handleOnboardingSubmit} className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-iron-accent font-black text-[10px] uppercase tracking-widest ml-1">Edad</label>
+                  <input type="number" required value={age} onChange={(e) => setAge(Number(e.target.value))} placeholder="Años" className="w-full bg-iron-900 border-2 border-iron-700 rounded-2xl p-4 text-white font-bold outline-none focus:border-iron-accent transition-colors" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-iron-accent font-black text-[10px] uppercase tracking-widest ml-1">Género</label>
+                  <select value={gender} onChange={(e) => setGender(e.target.value)} className="w-full bg-iron-900 border-2 border-iron-700 rounded-2xl p-4 text-white font-bold outline-none focus:border-iron-accent transition-colors appearance-none">
+                    <option value="Hombre">Hombre</option>
+                    <option value="Mujer">Mujer</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-iron-accent font-black text-[10px] uppercase tracking-widest ml-1">Altura (cm)</label>
+                  <input type="number" required value={height} onChange={(e) => setHeight(Number(e.target.value))} placeholder="Ej: 175" className="w-full bg-iron-900 border-2 border-iron-700 rounded-2xl p-4 text-white font-bold outline-none focus:border-iron-accent transition-colors" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-iron-accent font-black text-[10px] uppercase tracking-widest ml-1">Peso (kg)</label>
+                  <input type="number" required value={weight} onChange={(e) => setWeight(Number(e.target.value))} placeholder="Ej: 80" className="w-full bg-iron-900 border-2 border-iron-700 rounded-2xl p-4 text-white font-bold outline-none focus:border-iron-accent transition-colors" />
+                </div>
+              </div>
+
+              <button 
+                type="submit" 
+                disabled={isSavingOnboarding}
+                className="w-full bg-iron-accent text-iron-900 font-black py-5 rounded-2xl flex items-center justify-center gap-2 uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-iron-accent/20 disabled:opacity-50"
+              >
+                {isSavingOnboarding ? <Loader2 className="animate-spin" /> : <CheckCircle2 size={20} strokeWidth={3} />}
+                {isSavingOnboarding ? "Sincronizando..." : "Finalizar Perfil"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
       <nav className="bg-iron-800 p-4 border-b-4 border-iron-900">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          
           <div className="flex items-center gap-2 text-iron-accent">
             <Dumbbell size={32} strokeWidth={1} />
             <h1 className="text-2xl font-extrabold text-iron-100 tracking-tight uppercase">Iron Pace</h1>
@@ -137,27 +247,16 @@ export const Dashboard = () => {
       <main className="flex-grow p-12 relative">
         <div className="max-w-6xl mx-auto flex flex-col gap-12">
           
-          
           {currentTab === "Inicio" && (
             <>
-              <DashboardCard 
-                title="AÑADE NUEVOS EJERCICIOS" 
-                subtitle="Elige el tipo de ejercicio"
-              >
-                <div 
-                  onClick={() => openModal("Gym")} 
-                  className="flex flex-col items-center gap-2 group cursor-pointer"
-                >
+              <DashboardCard title="AÑADE NUEVOS EJERCICIOS" subtitle="Elige el tipo de ejercicio">
+                <div onClick={() => openModal("Gym")} className="flex flex-col items-center gap-2 group cursor-pointer">
                   <div className="bg-iron-accent text-iron-900 p-6 rounded-full hover:scale-105 active:scale-95 transition-transform duration-200">
                     <Dumbbell size={36} strokeWidth={2.5} />
                   </div>
                   <span className="text-xl font-bold uppercase text-iron-accent group-hover:scale-105 transition-transform">Gym</span>
                 </div>
-
-                <div 
-                  onClick={() => openModal("Cardio")} 
-                  className="flex flex-col items-center gap-2 group cursor-pointer"
-                >
+                <div onClick={() => openModal("Cardio")} className="flex flex-col items-center gap-2 group cursor-pointer">
                   <div className="bg-iron-accent text-iron-900 p-6 rounded-full hover:scale-105 active:scale-95 transition-transform duration-200">
                     <Activity size={36} strokeWidth={2.5} />
                   </div>
@@ -171,12 +270,7 @@ export const Dashboard = () => {
                      <span className="relative flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-iron-accent opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-iron-accent"></span></span>
                      Tu sesión activa
                    </p>
-                   <ActiveGymSession 
-                     exercises={activeSession} 
-                     onFinish={finishSession} 
-                     onAddExercise={() => openModal("SelectGym")} 
-                     onCancel={cancelSession}
-                   />
+                   <ActiveGymSession exercises={activeSession} onFinish={finishSession} onAddExercise={() => openModal("SelectGym")} onCancel={cancelSession} />
                 </div>
               )}
 
@@ -186,24 +280,14 @@ export const Dashboard = () => {
                      <span className="relative flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-iron-accent opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-iron-accent"></span></span>
                      Tu sesión activa
                    </p>
-                   <ActiveCardioSession 
-                     exercises={activeSession} 
-                     onFinish={finishSession} 
-                     onCancel={cancelSession}
-                   />
+                   <ActiveCardioSession exercises={activeSession} onFinish={finishSession} onCancel={cancelSession} />
                 </div>
               )}
 
               <p className="text-iron-100 font-medium ml-4 -mb-8">¿Empezamos la sesión?</p>
 
-              <DashboardCard 
-                title="NUEVA SESIÓN DE ENTRENAMIENTO" 
-                subtitle="Selecciona los ejercicios de hoy"
-              >
-                <button 
-                  onClick={() => openModal("ChooseSessionType")}
-                  className="bg-iron-accent text-iron-900 p-6 rounded-2xl hover:scale-105 active:scale-95 transition-transform duration-200"
-                >
+              <DashboardCard title="NUEVA SESIÓN DE ENTRENAMIENTO" subtitle="Selecciona los ejercicios de hoy">
+                <button onClick={() => openModal("ChooseSessionType")} className="bg-iron-accent text-iron-900 p-6 rounded-2xl hover:scale-105 active:scale-95 transition-transform duration-200">
                   <Plus size={36} strokeWidth={2.5} />
                 </button>
               </DashboardCard>
@@ -211,11 +295,8 @@ export const Dashboard = () => {
           )}
 
           {currentTab === "Historial" && <SessionHistory />}
-          
           {currentTab === "Gym" && <GymLibrary />}
-          
           {currentTab === "Cardio" && <CardioLibrary />}
-
           {currentTab === "Perfil" && <Profile />}
           
         </div>
@@ -224,25 +305,18 @@ export const Dashboard = () => {
       <Modal isOpen={isModalOpen} onClose={closeModal}>
         {modalType === "Gym" && <GymExerciseForm />}
         {modalType === "Cardio" && <CardioSessionForm />}
-        
         {modalType === "ChooseSessionType" && (
           <div className="p-8 text-center bg-iron-800 rounded-none sm:rounded-2xl">
             <h3 className="text-2xl font-bold text-iron-100 mb-2 uppercase">¿Qué toca hoy?</h3>
             <p className="text-iron-100 mb-8 font-medium">Elige el tipo de sesión que quieres comenzar</p>
             <div className="flex justify-center gap-8">
-              <div 
-                onClick={() => setModalType("SelectGym")} 
-                className="flex flex-col items-center gap-2 group cursor-pointer"
-              >
+              <div onClick={() => setModalType("SelectGym")} className="flex flex-col items-center gap-2 group cursor-pointer">
                 <div className="bg-iron-accent text-iron-900 p-6 rounded-full hover:scale-105 transition-transform">
                   <Dumbbell size={32} strokeWidth={2.5} />
                 </div>
                 <span className="text-lg font-bold uppercase text-iron-accent">Gym</span>
               </div>
-              <div 
-                onClick={() => setModalType("SelectCardio")} 
-                className="flex flex-col items-center gap-2 group cursor-pointer"
-              >
+              <div onClick={() => setModalType("SelectCardio")} className="flex flex-col items-center gap-2 group cursor-pointer">
                 <div className="bg-iron-accent text-iron-900 p-6 rounded-full hover:scale-105 transition-transform">
                   <Activity size={32} strokeWidth={2.5} />
                 </div>
