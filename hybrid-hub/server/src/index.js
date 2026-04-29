@@ -5,17 +5,16 @@ import { connectDB } from './config/db.js';
 
 import workoutRoutes from './routes/workoutRoutes.js';
 import sessionRoutes from './routes/sessionRoutes.js';
+import userRoutes from './routes/userRoutes.js'; 
 
 dotenv.config();
 
 const app = express();
-const userRoutes = require('./routes/userRoutes');
 
 app.use(cors());
 app.use(express.json());
-app.use('/api/users', userRoutes);
 
-// Rutas
+app.use('/api/users', userRoutes);
 app.use('/api/workouts', workoutRoutes); 
 app.use('/api/sessions', sessionRoutes);
 
