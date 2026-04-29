@@ -3,11 +3,10 @@ import { signOut } from "firebase/auth";
 import { auth } from "../config/firebase";
 import { useAuth } from "../context/AuthContext";
 
-import { Home, Dumbbell, Activity, Calendar, Plus, User, DumbbellIcon } from "lucide-react";
+import { Home, Dumbbell, Activity, Calendar, Plus, User } from "lucide-react";
 
 import { DashboardCard } from "../components/DashboardCard";
 import { NavItem } from "../components/NavItem";
-import { ActionIconCard } from "../components/ActionIconCard";
 
 import { Modal } from "../components/modal";
 import { GymExerciseForm } from "../components/GymExerciseForm";

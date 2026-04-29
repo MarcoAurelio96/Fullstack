@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckCircle2, ChevronRight, Timer, Route, XCircle } from "lucide-react";
+import { CheckCircle2, Timer, Route, XCircle } from "lucide-react";
 import confetti from "canvas-confetti";
 
 interface CardioExercise {
