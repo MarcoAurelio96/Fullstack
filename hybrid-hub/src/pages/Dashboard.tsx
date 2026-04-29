@@ -64,7 +64,7 @@ export const Dashboard = () => {
 
   const finishSession = async (finalData: any[]) => {
     try {
-      const response = await fetch("http://localhost:5000/api/sessions", {
+      const response = await fetch("/api/sessions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
