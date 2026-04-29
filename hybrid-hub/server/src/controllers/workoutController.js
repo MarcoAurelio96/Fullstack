@@ -1,4 +1,4 @@
-import { Workout } from '../models/Workout.js';
+import { Workout } from '../models/workout.js';
 
 // GET: Obtener los entrenamientos
 export const getWorkouts = async (req, res) => {
