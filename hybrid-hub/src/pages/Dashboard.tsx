@@ -20,12 +20,13 @@ import { ActiveCardioSession } from "../components/ActiveCardioSession";
 import { SessionHistory } from "../components/SessionHistory";
 import { GymLibrary } from "../components/GymLibrary";
 import { CardioLibrary } from "../components/CardioLibrary";
+import { Profile } from "../components/Profile";
 
 type ModalType = "Gym" | "Cardio" | "ChooseSessionType" | "SelectGym" | "SelectCardio" | null;
 
 export const Dashboard = () => {
   const { currentUser } = useAuth();
-  const [currentTab, setCurrentTab] = useState<"Inicio" | "Gym" | "Cardio" | "Historial">("Inicio");
+  const [currentTab, setCurrentTab] = useState<"Inicio" | "Gym" | "Cardio" | "Historial" | "Perfil">("Inicio");
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<ModalType>(null);
@@ -126,7 +127,7 @@ export const Dashboard = () => {
             <button onClick={handleLogout} className="text-gray-400 hover:text-red-400 text-sm font-bold transition-colors">
               Cerrar Sesión
             </button>
-            <div className="bg-iron-900 text-iron-accent p-3 rounded-xl border-2 border-transparent hover:border-iron-accent transition-colors cursor-pointer">
+            <div onClick={() => setCurrentTab("Perfil")} className="bg-iron-900 text-iron-accent p-3 rounded-xl border-2 border-transparent hover:border-iron-accent transition-colors cursor-pointer">
               <User size={24} />
             </div>
           </div>
@@ -214,6 +215,8 @@ export const Dashboard = () => {
           {currentTab === "Gym" && <GymLibrary />}
           
           {currentTab === "Cardio" && <CardioLibrary />}
+
+          {currentTab === "Perfil" && <Profile />}
           
         </div>
       </main>
