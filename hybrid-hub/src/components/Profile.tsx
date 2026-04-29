@@ -100,8 +100,8 @@ export const Profile = () => {
         const sessions = await sessionsRes.json();
 
         if (Array.isArray(sessions)) {
-          const gymCount = sessions.filter((s: any) => s.type === "Gym" || s.category === "Gym").length;
-          const cardioCount = sessions.filter((s: any) => s.type === "Cardio" || s.category === "Cardio").length;
+          const gymCount = sessions.filter((s: any) => s.sessionType === "Gym").length;
+          const cardioCount = sessions.filter((s: any) => s.sessionType === "Cardio").length;
           
           setGymSessions(gymCount);
           setCardioSessions(cardioCount);
@@ -114,7 +114,9 @@ export const Profile = () => {
               return currentDate > latestDate ? current : latest;
             });
             const lastDate = new Date(mostRecent.createdAt || mostRecent.date);
-            const diffDays = Math.floor((new Date().getTime() - lastDate.getTime()) / (1000 * 3600 * 24));
+            const today = new Date();
+            const diffTime = Math.abs(today.getTime() - lastDate.getTime());
+            const diffDays = Math.floor(diffTime / (1000 * 3600 * 24));
             setDaysSinceLast(diffDays);
           }
         }
@@ -189,7 +191,6 @@ export const Profile = () => {
           <h3 className="text-iron-accent font-black uppercase text-xs tracking-widest mb-6">Datos del Atleta</h3>
           
           <div className="space-y-4 mb-8">
-            {/* Edad */}
             <div className="flex justify-between items-center border-b border-iron-700 pb-2">
               <span className="text-gray-500 font-black uppercase text-[10px]">Edad:</span>
               {isEditing ? (
@@ -199,7 +200,6 @@ export const Profile = () => {
               )}
             </div>
 
-            {/* Género */}
             <div className="flex justify-between items-center border-b border-iron-700 pb-2">
               <span className="text-gray-500 font-black uppercase text-[10px]">Género:</span>
               {isEditing ? (
@@ -213,7 +213,6 @@ export const Profile = () => {
               )}
             </div>
 
-            {/* Altura */}
             <div className="flex justify-between items-center border-b border-iron-700 pb-2">
               <span className="text-gray-500 font-black uppercase text-[10px]">Altura (cm):</span>
               {isEditing ? (
@@ -223,7 +222,6 @@ export const Profile = () => {
               )}
             </div>
 
-            {/* Peso */}
             <div className="flex justify-between items-center border-b border-iron-700 pb-2">
               <span className="text-gray-500 font-black uppercase text-[10px]">Peso (kg):</span>
               {isEditing ? (
