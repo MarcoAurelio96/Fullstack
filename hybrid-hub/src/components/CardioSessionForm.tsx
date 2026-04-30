@@ -47,17 +47,18 @@ export const CardioSessionForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-8 space-y-6">
-      <div className="text-center mb-6">
-        <div className="inline-flex p-3 rounded-xl bg-iron-900 text-iron-accent mb-3">
-          <Activity size={32} />
+    <form onSubmit={handleSubmit} className="p-4 sm:p-8 space-y-5 sm:space-y-6">
+      
+      <div className="text-center mb-4 sm:mb-6">
+        <div className="inline-flex p-3 rounded-xl bg-iron-900 text-iron-accent mb-2 sm:mb-3 shadow-inner">
+          <Activity className="w-6 h-6 sm:w-8 sm:h-8" />
         </div>
-        <h3 className="text-2xl font-black text-iron-100 uppercase tracking-tight">Nueva Ruta</h3>
+        <h3 className="text-xl sm:text-2xl font-black text-iron-100 uppercase tracking-tight">Nueva Ruta</h3>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 sm:space-y-5">
         <div>
-          <label className="block text-xs font-black text-iron-accent uppercase mb-2 ml-1">Nombre de la Ruta</label>
+          <label className="block text-[10px] sm:text-xs font-black text-iron-accent uppercase mb-1 sm:mb-2 ml-1">Nombre de la Ruta</label>
           <input 
             type="text" 
             required
@@ -69,16 +70,16 @@ export const CardioSessionForm = () => {
         </div>
 
         <div>
-          <label className="block text-xs font-black text-iron-accent uppercase mb-2 ml-1">Tipo de Actividad</label>
-          <div className="flex gap-4">
+          <label className="block text-[10px] sm:text-xs font-black text-iron-accent uppercase mb-1 sm:mb-2 ml-1">Tipo de Actividad</label>
+          <div className="flex gap-3 sm:gap-4">
             {["Correr", "Andar"].map(type => (
               <button
                 key={type}
                 type="button"
                 onClick={() => setCardioType(type)}
-                className={`flex-1 py-3 rounded-xl font-bold border-2 transition-all ${
+                className={`flex-1 py-3 sm:py-4 rounded-xl text-sm sm:text-base font-bold border-2 transition-all ${
                   cardioType === type 
-                    ? 'bg-iron-accent border-iron-accent text-iron-900' 
+                    ? 'bg-iron-accent border-iron-accent text-iron-900 shadow-md shadow-iron-accent/20' 
                     : 'bg-iron-900 border-iron-700 text-gray-400 hover:border-gray-500'
                 }`}
               >
@@ -88,24 +89,24 @@ export const CardioSessionForm = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
           <div>
-            <label className="block text-xs font-black text-iron-accent uppercase mb-2 ml-1">Distancia (km)</label>
+            <label className="block text-[10px] sm:text-xs font-black text-iron-accent uppercase mb-1 sm:mb-2 ml-1">Distancia (km)</label>
             <input 
               type="number" 
               step="0.1"
               value={distance}
               onChange={(e) => setDistance(Number(e.target.value))}
-              className="w-full bg-iron-900 border-2 border-iron-700 rounded-xl px-4 py-3 text-iron-100 outline-none focus:border-iron-accent transition-colors"
+              className="w-full bg-iron-900 border-2 border-iron-700 rounded-xl px-4 py-3 text-iron-100 outline-none focus:border-iron-accent transition-colors text-center"
             />
           </div>
           <div>
-            <label className="block text-xs font-black text-iron-accent uppercase mb-2 ml-1">Duración (min)</label>
+            <label className="block text-[10px] sm:text-xs font-black text-iron-accent uppercase mb-1 sm:mb-2 ml-1">Duración (min)</label>
             <input 
               type="number" 
               value={duration}
               onChange={(e) => setDuration(Number(e.target.value))}
-              className="w-full bg-iron-900 border-2 border-iron-700 rounded-xl px-4 py-3 text-iron-100 outline-none focus:border-iron-accent transition-colors"
+              className="w-full bg-iron-900 border-2 border-iron-700 rounded-xl px-4 py-3 text-iron-100 outline-none focus:border-iron-accent transition-colors text-center"
             />
           </div>
         </div>
@@ -114,7 +115,7 @@ export const CardioSessionForm = () => {
       <button 
         type="submit"
         disabled={!currentUser?.email}
-        className="w-full bg-iron-accent text-iron-900 font-black py-4 rounded-xl flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-widest disabled:opacity-50"
+        className="w-full bg-iron-accent text-iron-900 font-black py-4 rounded-xl flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-transform uppercase tracking-widest disabled:opacity-50 mt-2 sm:mt-6 text-sm sm:text-base"
       >
         <PlusCircle size={20} />
         Guardar en Biblioteca
