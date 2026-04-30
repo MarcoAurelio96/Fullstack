@@ -47,18 +47,18 @@ export const CardioSessionForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 sm:p-8 space-y-5 sm:space-y-6">
+    <form onSubmit={handleSubmit} className="p-4 sm:p-8 space-y-4 sm:space-y-6 pb-8">
       
-      <div className="text-center mb-4 sm:mb-6">
+      <div className="text-center mb-2 sm:mb-6">
         <div className="inline-flex p-3 rounded-xl bg-iron-900 text-iron-accent mb-2 sm:mb-3 shadow-inner">
           <Activity className="w-6 h-6 sm:w-8 sm:h-8" />
         </div>
         <h3 className="text-xl sm:text-2xl font-black text-iron-100 uppercase tracking-tight">Nueva Ruta</h3>
       </div>
 
-      <div className="space-y-4 sm:space-y-5">
+      <div className="space-y-3 sm:space-y-4">
         <div>
-          <label className="block text-[10px] sm:text-xs font-black text-iron-accent uppercase mb-1 sm:mb-2 ml-1">Nombre de la Ruta</label>
+          <label className="block text-[10px] sm:text-xs font-black text-iron-accent uppercase mb-1 ml-1">Nombre de la Ruta</label>
           <input 
             type="text" 
             required
@@ -70,7 +70,7 @@ export const CardioSessionForm = () => {
         </div>
 
         <div>
-          <label className="block text-[10px] sm:text-xs font-black text-iron-accent uppercase mb-1 sm:mb-2 ml-1">Tipo de Actividad</label>
+          <label className="block text-[10px] sm:text-xs font-black text-iron-accent uppercase mb-1 ml-1">Tipo de Actividad</label>
           <div className="flex gap-3 sm:gap-4">
             {["Correr", "Andar"].map(type => (
               <button
@@ -91,7 +91,7 @@ export const CardioSessionForm = () => {
 
         <div className="grid grid-cols-2 gap-3 sm:gap-4">
           <div>
-            <label className="block text-[10px] sm:text-xs font-black text-iron-accent uppercase mb-1 sm:mb-2 ml-1">Distancia (km)</label>
+            <label className="block text-[10px] sm:text-xs font-black text-iron-accent uppercase mb-1 ml-1">Distancia (km)</label>
             <input 
               type="number" 
               step="0.1"
@@ -101,7 +101,7 @@ export const CardioSessionForm = () => {
             />
           </div>
           <div>
-            <label className="block text-[10px] sm:text-xs font-black text-iron-accent uppercase mb-1 sm:mb-2 ml-1">Duración (min)</label>
+            <label className="block text-[10px] sm:text-xs font-black text-iron-accent uppercase mb-1 ml-1">Duración (min)</label>
             <input 
               type="number" 
               value={duration}
@@ -115,10 +115,10 @@ export const CardioSessionForm = () => {
       <button 
         type="submit"
         disabled={!currentUser?.email}
-        className="w-full bg-iron-accent text-iron-900 font-black py-4 rounded-xl flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-transform uppercase tracking-widest disabled:opacity-50 mt-2 sm:mt-6 text-sm sm:text-base"
+        className="w-full bg-iron-accent text-iron-900 font-black py-4 rounded-xl flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-transform uppercase tracking-widest disabled:opacity-50 mt-4 text-sm"
       >
         <PlusCircle size={20} />
-        Guardar en Biblioteca
+        Guardar
       </button>
     </form>
   );

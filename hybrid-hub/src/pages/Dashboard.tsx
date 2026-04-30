@@ -358,7 +358,7 @@ export const Dashboard = () => {
         {modalType === "Gym" && <GymExerciseForm />}
         {modalType === "Cardio" && <CardioSessionForm />}
         {modalType === "ChooseSessionType" && (
-          <div className="p-6 sm:p-8 text-center bg-iron-800 rounded-none sm:rounded-2xl h-full sm:h-auto flex flex-col justify-center">
+          <div className="p-6 pb-12 sm:p-8 text-center bg-iron-800 rounded-none sm:rounded-2xl">
             <h3 className="text-xl sm:text-2xl font-bold text-iron-100 mb-2 uppercase">¿Qué toca hoy?</h3>
             <p className="text-iron-100 mb-8 font-medium text-sm sm:text-base">Elige el tipo de sesión que quieres comenzar</p>
             <div className="flex justify-center gap-6 sm:gap-8">
