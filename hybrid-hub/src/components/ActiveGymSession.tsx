@@ -147,7 +147,6 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
   };
 
   return (
-    // Se ha quitado el max-h estricto para que fluya mejor si es necesario, pero mantenemos flex-col
     <div className="w-full bg-iron-800 rounded-2xl border-4 border-iron-900 shadow-2xl overflow-hidden animate-in slide-in-from-top duration-500 flex flex-col">
       
       {/* CABECERA */}
@@ -157,7 +156,6 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
           <p className="text-iron-accent text-[10px] sm:text-xs font-bold uppercase tracking-widest">En vivo • {sessionExercises.length} Ejercicios</p>
         </div>
         <div className="flex items-center gap-3">
-          {/* BOTÓN PARA ABRIR/CERRAR EL CRONÓMETRO */}
           <button 
             onClick={() => setShowTimer(!showTimer)}
             className={`p-2 rounded-xl transition-colors ${showTimer ? 'bg-iron-accent text-iron-900' : 'bg-iron-800 text-iron-accent hover:bg-iron-700'}`}
@@ -171,7 +169,7 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
         </div>
       </div>
 
-      {/* LISTA DE EJERCICIOS (Se ha quitado el pb-32 gigante que dejaba espacio fantasma) */}
+      {/* LISTA DE EJERCICIOS */}
       <div className="p-4 sm:p-6 space-y-4 bg-iron-800 overflow-y-auto flex-grow z-0 pb-6">
         {sessionExercises.length === 0 ? (
           <p className="text-center text-gray-500 py-8 font-bold uppercase tracking-widest text-sm">No hay ejercicios seleccionados</p>
@@ -179,10 +177,8 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
           sessionExercises.map((ex) => {
             const isCompleted = completedExercises.includes(ex._id);
             return (
-              // DISEÑO RESPONSIVE: flex-col en móvil, flex-row en sm+
               <div key={ex._id} className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-iron-900 rounded-xl border-2 transition-all gap-4 ${isCompleted ? 'border-iron-accent/50 opacity-75' : 'border-transparent hover:border-iron-accent/30'}`}>
                 
-                {/* Parte Superior / Izquierda (Nombre y Check) */}
                 <div className="flex items-start sm:items-center gap-3 w-full sm:w-auto">
                   <button 
                     onClick={() => toggleCompletion(ex._id)}
@@ -197,13 +193,11 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
                     <p className="text-[10px] text-gray-500 font-black uppercase mt-1 tracking-widest">{ex.sets} x {ex.reps} Reps • {ex.bodyPart}</p>
                   </div>
                   
-                  {/* Papelera en Móvil (Arriba a la derecha) */}
                   <button onClick={() => removeExercise(ex._id)} className="sm:hidden p-2 text-gray-600 hover:text-red-500 transition-colors shrink-0">
                     <Trash2 size={18} />
                   </button>
                 </div>
 
-                {/* Parte Inferior / Derecha (Input Peso) */}
                 <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto pl-10 sm:pl-0">
                   <div className="flex items-center gap-2 bg-iron-800 border-2 border-iron-700 rounded-xl px-3 py-1.5 focus-within:border-iron-accent transition-all">
                     <Weight size={16} className={isCompleted ? "text-gray-500" : "text-iron-accent"} />
@@ -217,7 +211,6 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
                     <span className="text-[10px] font-black text-gray-500 uppercase">kg</span>
                   </div>
                   
-                  {/* Papelera en Escritorio */}
                   <button onClick={() => removeExercise(ex._id)} className="hidden sm:block p-2 text-gray-600 hover:text-red-500 transition-colors ml-2 shrink-0">
                     <Trash2 size={20} />
                   </button>
@@ -227,7 +220,7 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
           })
         )}
 
-        {/* ... FORMULARIO RÁPIDO ... */}
+        {/* FORMULARIO RÁPIDO */}
         {isAddingCustom && (
           <div className="p-4 bg-iron-900 rounded-xl border-2 border-iron-accent/50 space-y-3 animate-in fade-in zoom-in duration-200">
             <input type="text" placeholder="Nombre del ejercicio..." value={customExercise.name} onChange={(e) => setCustomExercise({...customExercise, name: e.target.value})} className="w-full bg-iron-800 border-2 border-iron-700 rounded-lg p-3 text-iron-100 font-bold outline-none focus:border-iron-accent text-sm" autoFocus />
@@ -277,14 +270,14 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
         </button>
       </div>
 
-      {/* PANEL DEL CRONÓMETRO (Convertido a footer estático shrink-0 en lugar de absolute) */}
+      {/* PANEL DEL CRONÓMETRO - REDISEÑADO PARA MOSTRAR INPUTS SIEMPRE */}
       {showTimer && (
         <div className="w-full bg-iron-900 border-t-4 border-iron-800 p-4 rounded-b-xl z-30 animate-in slide-in-from-bottom shrink-0 shadow-[0_-10px_20px_rgba(0,0,0,0.3)]">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 max-w-2xl mx-auto w-full">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-5 max-w-3xl mx-auto w-full">
             
             {/* Display del Tiempo y controles manuales */}
-            <div className="flex items-center justify-between sm:justify-center gap-4 w-full sm:w-auto">
-              <span className={`text-4xl font-black tabular-nums transition-colors ${timeLeft > 0 && timeLeft <= 5 ? 'text-red-500 animate-pulse' : 'text-iron-accent'}`}>
+            <div className="flex items-center justify-between sm:justify-center gap-4 w-full sm:w-auto border-b-2 border-iron-800 sm:border-0 pb-4 sm:pb-0">
+              <span className={`text-5xl font-black tabular-nums transition-colors ${timeLeft > 0 && timeLeft <= 5 ? 'text-red-500 animate-pulse' : 'text-iron-accent'}`}>
                 {formatTime(timeLeft)}
               </span>
               <div className="flex gap-2 shrink-0">
@@ -293,46 +286,50 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
                   disabled={timeLeft === 0}
                   className="bg-iron-800 p-3 rounded-xl text-iron-100 hover:text-iron-accent disabled:opacity-50 transition-colors"
                 >
-                  {isTimerRunning ? <Pause size={20} /> : <Play size={20} />}
+                  {isTimerRunning ? <Pause size={24} /> : <Play size={24} />}
                 </button>
                 <button 
                   onClick={() => { setTimeLeft(0); setIsTimerRunning(false); }}
                   className="bg-iron-800 p-3 rounded-xl text-iron-100 hover:text-red-400 transition-colors"
                 >
-                  <RotateCcw size={20} />
+                  <RotateCcw size={24} />
                 </button>
               </div>
             </div>
 
-            {/* Ajustes y Botones Rápidos */}
-            <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-              {/* Botones de Inicio Rápido */}
-              <div className="flex gap-2 w-full sm:w-auto">
+            {/* Ajustes y Botones Rápidos con Inputs (VISIBLES EN MÓVIL) */}
+            <div className="flex flex-col gap-3 w-full sm:w-72 shrink-0">
+              
+              {/* Fila Serie */}
+              <div className="flex items-center justify-between gap-2 w-full">
                 <button 
                   onClick={() => startRest(restPerSet)} 
-                  className="flex-1 sm:flex-none bg-iron-800 border-2 border-iron-700 hover:border-iron-accent text-iron-100 px-4 py-3 sm:py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+                  className="flex-1 bg-iron-800 border-2 border-iron-700 hover:border-iron-accent text-iron-100 px-3 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-left flex justify-between items-center"
                 >
-                  Descanso Serie
+                  <span>Descanso Serie</span>
+                  <Play size={14} className="text-iron-accent opacity-50" />
                 </button>
-                <button 
-                  onClick={() => startRest(restPerExercise)} 
-                  className="flex-1 sm:flex-none bg-iron-800 border-2 border-iron-700 hover:border-iron-accent text-iron-100 px-4 py-3 sm:py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
-                >
-                  Descanso Ejerc.
-                </button>
+                <div className="flex items-center gap-1 shrink-0 bg-iron-800 px-2 py-1 rounded-xl border border-iron-700 focus-within:border-iron-accent transition-colors">
+                   <input type="number" value={restPerSet} onChange={(e)=>setRestPerSet(Number(e.target.value))} className="w-10 bg-transparent text-center text-iron-100 text-sm font-bold outline-none" />
+                   <span className="text-[10px] text-gray-500 font-bold pr-1">s</span>
+                </div>
               </div>
 
-              {/* Inputs Personalizables ocultos en pantallas muy pequeñas */}
-              <div className="hidden sm:flex gap-3">
-                <div className="flex flex-col items-center">
-                  <span className="text-[8px] text-gray-500 font-black uppercase tracking-widest mb-1">Serie (seg)</span>
-                  <input type="number" value={restPerSet} onChange={(e)=>setRestPerSet(Number(e.target.value))} className="w-14 bg-iron-800 text-center text-iron-100 text-xs font-bold p-1 border border-iron-700 rounded outline-none focus:border-iron-accent" />
-                </div>
-                <div className="flex flex-col items-center">
-                  <span className="text-[8px] text-gray-500 font-black uppercase tracking-widest mb-1">Ejerc. (seg)</span>
-                  <input type="number" value={restPerExercise} onChange={(e)=>setRestPerExercise(Number(e.target.value))} className="w-14 bg-iron-800 text-center text-iron-100 text-xs font-bold p-1 border border-iron-700 rounded outline-none focus:border-iron-accent" />
+              {/* Fila Ejercicio */}
+              <div className="flex items-center justify-between gap-2 w-full">
+                <button 
+                  onClick={() => startRest(restPerExercise)} 
+                  className="flex-1 bg-iron-800 border-2 border-iron-700 hover:border-iron-accent text-iron-100 px-3 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-left flex justify-between items-center"
+                >
+                  <span>Descanso Ejerc.</span>
+                  <Play size={14} className="text-iron-accent opacity-50" />
+                </button>
+                <div className="flex items-center gap-1 shrink-0 bg-iron-800 px-2 py-1 rounded-xl border border-iron-700 focus-within:border-iron-accent transition-colors">
+                   <input type="number" value={restPerExercise} onChange={(e)=>setRestPerExercise(Number(e.target.value))} className="w-10 bg-transparent text-center text-iron-100 text-sm font-bold outline-none" />
+                   <span className="text-[10px] text-gray-500 font-bold pr-1">s</span>
                 </div>
               </div>
+
             </div>
 
           </div>
