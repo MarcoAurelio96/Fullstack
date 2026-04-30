@@ -165,26 +165,27 @@ export const Dashboard = () => {
   return (
     <div className="min-h-screen bg-iron-900 flex flex-col font-sans selection:bg-iron-accent selection:text-iron-900">
       
+      {/* ONBOARDING MODAL */}
       {showOnboarding && (
         <div className="fixed inset-0 bg-iron-900/95 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-iron-800 w-full max-w-md rounded-3xl border-4 border-iron-900 p-8 shadow-2xl animate-in zoom-in duration-300">
+          <div className="bg-iron-800 w-full max-w-md rounded-3xl border-4 border-iron-900 p-6 sm:p-8 shadow-2xl animate-in zoom-in duration-300">
             <div className="text-center mb-8">
               <div className="bg-iron-900 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-iron-accent">
                 <User size={40} className="text-iron-accent" />
               </div>
-              <h2 className="text-2xl font-black text-iron-100 uppercase tracking-tighter">Bienvenido, {currentUser?.displayName?.split(' ')[0]}</h2>
-              <p className="text-gray-500 text-xs font-bold uppercase mt-2 tracking-widest">Completa tu perfil de atleta</p>
+              <h2 className="text-xl sm:text-2xl font-black text-iron-100 uppercase tracking-tighter">Bienvenido, {currentUser?.displayName?.split(' ')[0]}</h2>
+              <p className="text-gray-500 text-[10px] sm:text-xs font-bold uppercase mt-2 tracking-widest">Completa tu perfil de atleta</p>
             </div>
 
             <form onSubmit={handleOnboardingSubmit} className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-1">
                   <label className="text-iron-accent font-black text-[10px] uppercase tracking-widest ml-1">Edad</label>
-                  <input type="number" required value={age} onChange={(e) => setAge(Number(e.target.value))} placeholder="Años" className="w-full bg-iron-900 border-2 border-iron-700 rounded-2xl p-4 text-white font-bold outline-none focus:border-iron-accent transition-colors" />
+                  <input type="number" required value={age} onChange={(e) => setAge(Number(e.target.value))} placeholder="Años" className="w-full bg-iron-900 border-2 border-iron-700 rounded-2xl p-3 sm:p-4 text-white font-bold outline-none focus:border-iron-accent transition-colors" />
                 </div>
                 <div className="space-y-1">
                   <label className="text-iron-accent font-black text-[10px] uppercase tracking-widest ml-1">Género</label>
-                  <select value={gender} onChange={(e) => setGender(e.target.value)} className="w-full bg-iron-900 border-2 border-iron-700 rounded-2xl p-4 text-white font-bold outline-none focus:border-iron-accent transition-colors appearance-none">
+                  <select value={gender} onChange={(e) => setGender(e.target.value)} className="w-full bg-iron-900 border-2 border-iron-700 rounded-2xl p-3 sm:p-4 text-white font-bold outline-none focus:border-iron-accent transition-colors appearance-none">
                     <option value="Hombre">Hombre</option>
                     <option value="Mujer">Mujer</option>
                     <option value="Otro">Otro</option>
@@ -192,21 +193,21 @@ export const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-1">
                   <label className="text-iron-accent font-black text-[10px] uppercase tracking-widest ml-1">Altura (cm)</label>
-                  <input type="number" required value={height} onChange={(e) => setHeight(Number(e.target.value))} placeholder="Ej: 175" className="w-full bg-iron-900 border-2 border-iron-700 rounded-2xl p-4 text-white font-bold outline-none focus:border-iron-accent transition-colors" />
+                  <input type="number" required value={height} onChange={(e) => setHeight(Number(e.target.value))} placeholder="Ej: 175" className="w-full bg-iron-900 border-2 border-iron-700 rounded-2xl p-3 sm:p-4 text-white font-bold outline-none focus:border-iron-accent transition-colors" />
                 </div>
                 <div className="space-y-1">
                   <label className="text-iron-accent font-black text-[10px] uppercase tracking-widest ml-1">Peso (kg)</label>
-                  <input type="number" required value={weight} onChange={(e) => setWeight(Number(e.target.value))} placeholder="Ej: 80" className="w-full bg-iron-900 border-2 border-iron-700 rounded-2xl p-4 text-white font-bold outline-none focus:border-iron-accent transition-colors" />
+                  <input type="number" required value={weight} onChange={(e) => setWeight(Number(e.target.value))} placeholder="Ej: 80" className="w-full bg-iron-900 border-2 border-iron-700 rounded-2xl p-3 sm:p-4 text-white font-bold outline-none focus:border-iron-accent transition-colors" />
                 </div>
               </div>
 
               <button 
                 type="submit" 
                 disabled={isSavingOnboarding}
-                className="w-full bg-iron-accent text-iron-900 font-black py-5 rounded-2xl flex items-center justify-center gap-2 uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-iron-accent/20 disabled:opacity-50"
+                className="w-full bg-iron-accent text-iron-900 font-black py-4 sm:py-5 rounded-2xl flex items-center justify-center gap-2 uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-iron-accent/20 disabled:opacity-50 text-sm sm:text-base"
               >
                 {isSavingOnboarding ? <Loader2 className="animate-spin" /> : <CheckCircle2 size={20} strokeWidth={3} />}
                 {isSavingOnboarding ? "Sincronizando..." : "Finalizar Perfil"}
@@ -216,14 +217,19 @@ export const Dashboard = () => {
         </div>
       )}
 
-      <nav className="bg-iron-800 p-4 border-b-4 border-iron-900">
+      {/* NAVBAR PRINCIPAL (Sticky en Desktop, Header limpio en Móvil) */}
+      <nav className="bg-iron-800 p-4 border-b-4 border-iron-900 sticky top-0 z-40 shadow-md">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
+          
+          {/* Brand/Logo */}
           <div className="flex items-center gap-2 text-iron-accent">
-            <Dumbbell size={32} strokeWidth={1} />
-            <h1 className="text-2xl font-extrabold text-iron-100 tracking-tight uppercase">Iron Pace</h1>
+            <Dumbbell size={28} strokeWidth={1.5} className="sm:w-8 sm:h-8" />
+            {/* Ocultamos el texto en pantallas muy pequeñas si hace falta, aunque aquí entra bien */}
+            <h1 className="text-xl sm:text-2xl font-extrabold text-iron-100 tracking-tight uppercase">Iron Pace</h1>
           </div>
           
-          <div className="flex gap-4">
+          {/* TABS DESKTOP (Se ocultan en móvil 'md:hidden') */}
+          <div className="hidden md:flex gap-4">
             <div onClick={() => setCurrentTab("Inicio")} className="cursor-pointer">
               <NavItem icon={<Home size={24} />} label="Inicio" isActive={currentTab === "Inicio"} />
             </div>
@@ -238,55 +244,61 @@ export const Dashboard = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-6">
-            <button onClick={handleLogout} className="text-gray-400 hover:text-red-400 text-sm font-bold transition-colors">
+          {/* User Section */}
+          <div className="flex items-center gap-4 sm:gap-6">
+            <button onClick={handleLogout} className="text-gray-400 hover:text-red-400 text-xs sm:text-sm font-bold transition-colors">
               Cerrar Sesión
             </button>
             <img 
               onClick={() => setCurrentTab("Perfil")} 
               src={imageToDisplay} 
               alt="Avatar Perfil" 
-              className="w-10 h-10 rounded-full border-2 border-white hover:scale-105 transition-transform cursor-pointer object-cover shadow-md"
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white hover:scale-105 transition-transform cursor-pointer object-cover shadow-md"
             />
           </div>
         </div>
       </nav>
 
-      <main className="flex-grow p-12 relative">
-        <div className="max-w-6xl mx-auto flex flex-col gap-12">
+      {/* CONTENIDO PRINCIPAL */}
+      {/* pb-28 y md:pb-12 aseguran espacio para el menú inferior en móvil */}
+      <main className="flex-grow p-4 pb-28 md:p-12 md:pb-12 relative overflow-x-hidden">
+        <div className="max-w-6xl mx-auto flex flex-col gap-8 md:gap-12">
           
           {currentTab === "Inicio" && (
             <>
               {!activeSession ? (
                 <>
                   <DashboardCard title="AÑADE NUEVOS EJERCICIOS" subtitle="Elige el tipo de ejercicio">
-                    <div onClick={() => openModal("Gym")} className="flex flex-col items-center gap-2 group cursor-pointer">
-                      <div className="bg-iron-accent text-iron-900 p-6 rounded-full hover:scale-105 active:scale-95 transition-transform duration-200">
-                        <Dumbbell size={36} strokeWidth={2.5} />
+                    <div className="flex flex-row justify-around w-full gap-4">
+                      <div onClick={() => openModal("Gym")} className="flex flex-col items-center gap-2 group cursor-pointer w-full">
+                        <div className="bg-iron-accent text-iron-900 p-4 sm:p-6 rounded-full hover:scale-105 active:scale-95 transition-transform duration-200 shadow-lg shadow-iron-accent/20">
+                          <Dumbbell size={32} strokeWidth={2.5} className="sm:w-9 sm:h-9" />
+                        </div>
+                        <span className="text-sm sm:text-xl font-bold uppercase text-iron-accent group-hover:scale-105 transition-transform mt-2">Gym</span>
                       </div>
-                      <span className="text-xl font-bold uppercase text-iron-accent group-hover:scale-105 transition-transform">Gym</span>
-                    </div>
-                    <div onClick={() => openModal("Cardio")} className="flex flex-col items-center gap-2 group cursor-pointer">
-                      <div className="bg-iron-accent text-iron-900 p-6 rounded-full hover:scale-105 active:scale-95 transition-transform duration-200">
-                        <Activity size={36} strokeWidth={2.5} />
+                      
+                      <div onClick={() => openModal("Cardio")} className="flex flex-col items-center gap-2 group cursor-pointer w-full">
+                        <div className="bg-iron-accent text-iron-900 p-4 sm:p-6 rounded-full hover:scale-105 active:scale-95 transition-transform duration-200 shadow-lg shadow-iron-accent/20">
+                          <Activity size={32} strokeWidth={2.5} className="sm:w-9 sm:h-9" />
+                        </div>
+                        <span className="text-sm sm:text-xl font-bold uppercase text-iron-accent group-hover:scale-105 transition-transform mt-2">Cardio</span>
                       </div>
-                      <span className="text-xl font-bold uppercase text-iron-accent group-hover:scale-105 transition-transform">Cardio</span>
                     </div>
                   </DashboardCard>
 
-                  <p className="text-iron-100 font-medium ml-4 -mb-8">¿Empezamos la sesión?</p>
+                  <p className="text-iron-100 font-medium ml-2 sm:ml-4 -mb-4 sm:-mb-8 text-sm sm:text-base">¿Empezamos la sesión?</p>
 
                   <DashboardCard title="NUEVA SESIÓN DE ENTRENAMIENTO" subtitle="Selecciona los ejercicios de hoy">
-                    <button onClick={() => openModal("ChooseSessionType")} className="bg-iron-accent text-iron-900 p-6 rounded-2xl hover:scale-105 active:scale-95 transition-transform duration-200">
-                      <Plus size={36} strokeWidth={2.5} />
+                    <button onClick={() => openModal("ChooseSessionType")} className="w-full sm:w-auto bg-iron-accent text-iron-900 p-4 sm:p-6 rounded-2xl hover:scale-105 active:scale-95 transition-transform duration-200 flex justify-center shadow-lg shadow-iron-accent/20">
+                      <Plus size={32} strokeWidth={2.5} className="sm:w-9 sm:h-9" />
                     </button>
                   </DashboardCard>
                 </>
               ) : (
                 <>
                   {activeSessionType === "Gym" && (
-                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                       <p className="text-iron-accent font-bold ml-4 mb-4 flex items-center gap-2">
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 w-full">
+                       <p className="text-iron-accent font-bold ml-2 sm:ml-4 mb-4 flex items-center gap-2 text-sm sm:text-base">
                          <span className="relative flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-iron-accent opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-iron-accent"></span></span>
                          Tu sesión activa
                        </p>
@@ -295,8 +307,8 @@ export const Dashboard = () => {
                   )}
 
                   {activeSessionType === "Cardio" && (
-                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                       <p className="text-iron-accent font-bold ml-4 mb-4 flex items-center gap-2">
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 w-full">
+                       <p className="text-iron-accent font-bold ml-2 sm:ml-4 mb-4 flex items-center gap-2 text-sm sm:text-base">
                          <span className="relative flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-iron-accent opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-iron-accent"></span></span>
                          Tu sesión activa
                        </p>
@@ -316,25 +328,51 @@ export const Dashboard = () => {
         </div>
       </main>
 
+      {/* NAVBAR INFERIOR MÓVIL (Bottom Bar - Solo visible en sm y md) */}
+      <nav className="md:hidden fixed bottom-0 left-0 w-full bg-iron-900 border-t-2 border-iron-800 z-40 pb-safe pt-2 px-2 shadow-[0_-10px_20px_rgba(0,0,0,0.3)]">
+        <div className="flex justify-around items-center">
+          <div onClick={() => setCurrentTab("Inicio")} className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all w-16 ${currentTab === "Inicio" ? "text-iron-accent" : "text-gray-500"}`}>
+            <Home size={24} className={currentTab === "Inicio" ? "animate-bounce" : ""} />
+            <span className="text-[10px] font-bold uppercase tracking-wider">Inicio</span>
+          </div>
+          
+          <div onClick={() => setCurrentTab("Gym")} className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all w-16 ${currentTab === "Gym" ? "text-iron-accent" : "text-gray-500"}`}>
+            <Dumbbell size={24} className={currentTab === "Gym" ? "animate-bounce" : ""} />
+            <span className="text-[10px] font-bold uppercase tracking-wider">Gym</span>
+          </div>
+          
+          <div onClick={() => setCurrentTab("Cardio")} className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all w-16 ${currentTab === "Cardio" ? "text-iron-accent" : "text-gray-500"}`}>
+            <Activity size={24} className={currentTab === "Cardio" ? "animate-bounce" : ""} />
+            <span className="text-[10px] font-bold uppercase tracking-wider">Cardio</span>
+          </div>
+          
+          <div onClick={() => setCurrentTab("Historial")} className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all w-16 ${currentTab === "Historial" ? "text-iron-accent" : "text-gray-500"}`}>
+            <Calendar size={24} className={currentTab === "Historial" ? "animate-bounce" : ""} />
+            <span className="text-[10px] font-bold uppercase tracking-wider">Historial</span>
+          </div>
+        </div>
+      </nav>
+
+      {/* MODAL GLOBAL */}
       <Modal isOpen={isModalOpen} onClose={closeModal}>
         {modalType === "Gym" && <GymExerciseForm />}
         {modalType === "Cardio" && <CardioSessionForm />}
         {modalType === "ChooseSessionType" && (
-          <div className="p-8 text-center bg-iron-800 rounded-none sm:rounded-2xl">
-            <h3 className="text-2xl font-bold text-iron-100 mb-2 uppercase">¿Qué toca hoy?</h3>
-            <p className="text-iron-100 mb-8 font-medium">Elige el tipo de sesión que quieres comenzar</p>
-            <div className="flex justify-center gap-8">
+          <div className="p-6 sm:p-8 text-center bg-iron-800 rounded-none sm:rounded-2xl h-full sm:h-auto flex flex-col justify-center">
+            <h3 className="text-xl sm:text-2xl font-bold text-iron-100 mb-2 uppercase">¿Qué toca hoy?</h3>
+            <p className="text-iron-100 mb-8 font-medium text-sm sm:text-base">Elige el tipo de sesión que quieres comenzar</p>
+            <div className="flex justify-center gap-6 sm:gap-8">
               <div onClick={() => setModalType("SelectGym")} className="flex flex-col items-center gap-2 group cursor-pointer">
-                <div className="bg-iron-accent text-iron-900 p-6 rounded-full hover:scale-105 transition-transform">
+                <div className="bg-iron-accent text-iron-900 p-5 sm:p-6 rounded-full hover:scale-105 transition-transform shadow-lg shadow-iron-accent/20">
                   <Dumbbell size={32} strokeWidth={2.5} />
                 </div>
-                <span className="text-lg font-bold uppercase text-iron-accent">Gym</span>
+                <span className="text-sm sm:text-lg font-bold uppercase text-iron-accent mt-2">Gym</span>
               </div>
               <div onClick={() => setModalType("SelectCardio")} className="flex flex-col items-center gap-2 group cursor-pointer">
-                <div className="bg-iron-accent text-iron-900 p-6 rounded-full hover:scale-105 transition-transform">
+                <div className="bg-iron-accent text-iron-900 p-5 sm:p-6 rounded-full hover:scale-105 transition-transform shadow-lg shadow-iron-accent/20">
                   <Activity size={32} strokeWidth={2.5} />
                 </div>
-                <span className="text-lg font-bold uppercase text-iron-accent">Cardio</span>
+                <span className="text-sm sm:text-lg font-bold uppercase text-iron-accent mt-2">Cardio</span>
               </div>
             </div>
           </div>
