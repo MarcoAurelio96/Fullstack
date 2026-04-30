@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { CheckCircle2, Circle, Weight, Trash2, PlusCircle, XCircle } from "lucide-react";
+import { CheckCircle2, Circle, Weight, Trash2, PlusCircle, XCircle, Loader2 } from "lucide-react";
 import confetti from "canvas-confetti";
+import { useAuth } from "../context/AuthContext";
 
 interface Exercise {
   _id: string;
@@ -19,12 +20,22 @@ interface ActiveGymSessionProps {
 }
 
 export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel }: ActiveGymSessionProps) => {
-  const [sessionExercises, setSessionExercises] = useState(exercises);
+  const { currentUser } = useAuth(); 
   
+  const [sessionExercises, setSessionExercises] = useState(exercises);
   const [completedExercises, setCompletedExercises] = useState<string[]>([]);
   
   const [isAddingCustom, setIsAddingCustom] = useState(false);
-  const [customExercise, setCustomExercise] = useState({ name: "", sets: 3, reps: 10, weight: 0 });
+  const [isSavingCustom, setIsSavingCustom] = useState(false);
+  
+  // AÑADIDO: 'bodyPart' al estado inicial (por defecto 'Pecho')
+  const [customExercise, setCustomExercise] = useState({ 
+    name: "", 
+    bodyPart: "Pecho", 
+    sets: 3, 
+    reps: 10, 
+    weight: 0 
+  });
 
   useEffect(() => {
     setSessionExercises(exercises);
@@ -47,21 +58,47 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
     );
   };
 
-  const handleAddCustom = () => {
+  const handleAddCustom = async () => {
     if (!customExercise.name.trim()) return alert("Ponle un nombre al ejercicio");
     
-    const newEx: Exercise = {
-      _id: `custom-${Date.now()}`,
-      name: customExercise.name,
-      bodyPart: "Personalizado",
-      sets: customExercise.sets,
-      reps: customExercise.reps,
-      weight: customExercise.weight
-    };
-    
-    setSessionExercises(prev => [...prev, newEx]);
-    setIsAddingCustom(false);
-    setCustomExercise({ name: "", sets: 3, reps: 10, weight: 0 });
+    setIsSavingCustom(true);
+
+    try {
+      // Usamos el bodyPart que el usuario ha seleccionado
+      const response = await fetch("/api/workouts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userEmail: currentUser?.email,
+          name: customExercise.name,
+          type: "Gym",
+          bodyPart: customExercise.bodyPart 
+        })
+      });
+
+      if (!response.ok) throw new Error("Error al guardar en la biblioteca");
+
+      const savedWorkout = await response.json();
+
+      const newEx: Exercise = {
+        _id: savedWorkout._id, 
+        name: savedWorkout.name,
+        bodyPart: savedWorkout.bodyPart,
+        sets: customExercise.sets,
+        reps: customExercise.reps,
+        weight: customExercise.weight
+      };
+      
+      setSessionExercises(prev => [...prev, newEx]);
+      setIsAddingCustom(false);
+      // Reseteamos incluyendo el bodyPart
+      setCustomExercise({ name: "", bodyPart: "Pecho", sets: 3, reps: 10, weight: 0 }); 
+    } catch (error) {
+      console.error("Error creando ejercicio rápido:", error);
+      alert("Error al guardar el ejercicio en la base de datos.");
+    } finally {
+      setIsSavingCustom(false);
+    }
   };
 
   const handleFinish = () => {
@@ -99,7 +136,6 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
               <div key={ex._id} className={`flex items-center justify-between p-4 bg-iron-900 rounded-xl border-2 transition-all ${isCompleted ? 'border-iron-accent/50 opacity-75' : 'border-transparent hover:border-iron-accent/30'}`}>
                 
                 <div className="flex items-center gap-4">
-                  {/* BOTÓN DE CHECK MODIFICADO */}
                   <button 
                     onClick={() => toggleCompletion(ex._id)}
                     className={`p-1 rounded-full transition-all hover:scale-110 active:scale-95 ${isCompleted ? 'text-iron-accent' : 'text-gray-600 hover:text-gray-400'}`}
@@ -111,7 +147,7 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
                     <h4 className={`font-bold text-lg uppercase leading-none transition-colors ${isCompleted ? 'text-gray-400 line-through decoration-iron-accent/50' : 'text-iron-100'}`}>
                       {ex.name}
                     </h4>
-                    <p className="text-[10px] text-gray-500 font-black uppercase mt-1 tracking-widest">{ex.sets} x {ex.reps} Reps</p>
+                    <p className="text-[10px] text-gray-500 font-black uppercase mt-1 tracking-widest">{ex.sets} x {ex.reps} Reps • {ex.bodyPart}</p>
                   </div>
                 </div>
 
@@ -150,6 +186,23 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
               className="w-full bg-iron-800 border-2 border-iron-700 rounded-lg p-3 text-iron-100 font-bold outline-none focus:border-iron-accent"
               autoFocus
             />
+            
+            {/* NUEVO CAMPO: Selector de Grupo Muscular */}
+            <select
+              value={customExercise.bodyPart}
+              onChange={(e) => setCustomExercise({...customExercise, bodyPart: e.target.value})}
+              className="w-full bg-iron-800 border-2 border-iron-700 rounded-lg p-3 text-iron-100 font-bold outline-none focus:border-iron-accent appearance-none cursor-pointer"
+            >
+              <option value="Pecho">Pecho</option>
+              <option value="Espalda">Espalda</option>
+              <option value="Piernas">Piernas</option>
+              <option value="Hombros">Hombros</option>
+              <option value="Brazos">Brazos</option>
+              <option value="Core">Core</option>
+              <option value="Full Body">Full Body</option>
+              <option value="Otro">Otro</option>
+            </select>
+
             <div className="flex gap-2">
               <div className="flex-1 bg-iron-800 border-2 border-iron-700 rounded-lg p-2 flex flex-col">
                 <span className="text-[9px] text-gray-500 font-black uppercase tracking-widest text-center">Series</span>
@@ -166,7 +219,15 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
             </div>
             <div className="flex gap-2 pt-2">
               <button onClick={() => setIsAddingCustom(false)} className="flex-1 py-3 text-gray-400 font-black uppercase text-[10px] tracking-widest hover:text-red-400 transition-colors bg-iron-800 rounded-lg">Cancelar</button>
-              <button onClick={handleAddCustom} className="flex-1 py-3 bg-iron-accent text-iron-900 rounded-lg font-black uppercase text-[10px] tracking-widest hover:scale-[1.02] transition-transform">Guardar y Añadir</button>
+              
+              <button 
+                onClick={handleAddCustom} 
+                disabled={isSavingCustom}
+                className="flex-1 py-3 bg-iron-accent text-iron-900 rounded-lg font-black uppercase text-[10px] tracking-widest hover:scale-[1.02] transition-transform flex justify-center items-center gap-2 disabled:opacity-50"
+              >
+                {isSavingCustom ? <Loader2 size={14} className="animate-spin" /> : null}
+                {isSavingCustom ? "Guardando..." : "Guardar y Añadir"}
+              </button>
             </div>
           </div>
         )}
