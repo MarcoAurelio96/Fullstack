@@ -28,7 +28,6 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
   const [isAddingCustom, setIsAddingCustom] = useState(false);
   const [isSavingCustom, setIsSavingCustom] = useState(false);
   
-  // AÑADIDO: 'bodyPart' al estado inicial (por defecto 'Pecho')
   const [customExercise, setCustomExercise] = useState({ 
     name: "", 
     bodyPart: "Pecho", 
@@ -64,7 +63,6 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
     setIsSavingCustom(true);
 
     try {
-      // Usamos el bodyPart que el usuario ha seleccionado
       const response = await fetch("/api/workouts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -72,18 +70,22 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
           userEmail: currentUser?.email,
           name: customExercise.name,
           type: "Gym",
-          bodyPart: customExercise.bodyPart 
+          category: customExercise.bodyPart,
+          bodyPart: customExercise.bodyPart
         })
       });
 
-      if (!response.ok) throw new Error("Error al guardar en la biblioteca");
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.message || "Error al guardar en la biblioteca");
+      }
 
       const savedWorkout = await response.json();
 
       const newEx: Exercise = {
         _id: savedWorkout._id, 
         name: savedWorkout.name,
-        bodyPart: savedWorkout.bodyPart,
+        bodyPart: savedWorkout.category || savedWorkout.bodyPart || customExercise.bodyPart,
         sets: customExercise.sets,
         reps: customExercise.reps,
         weight: customExercise.weight
@@ -91,11 +93,10 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
       
       setSessionExercises(prev => [...prev, newEx]);
       setIsAddingCustom(false);
-      // Reseteamos incluyendo el bodyPart
       setCustomExercise({ name: "", bodyPart: "Pecho", sets: 3, reps: 10, weight: 0 }); 
     } catch (error) {
       console.error("Error creando ejercicio rápido:", error);
-      alert("Error al guardar el ejercicio en la base de datos.");
+      alert("Error al guardar el ejercicio en la base de datos. Revisa la consola.");
     } finally {
       setIsSavingCustom(false);
     }
@@ -187,7 +188,6 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
               autoFocus
             />
             
-            {/* NUEVO CAMPO: Selector de Grupo Muscular */}
             <select
               value={customExercise.bodyPart}
               onChange={(e) => setCustomExercise({...customExercise, bodyPart: e.target.value})}
