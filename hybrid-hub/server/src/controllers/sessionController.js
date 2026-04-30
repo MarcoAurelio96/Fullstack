@@ -3,10 +3,10 @@ import { Session } from '../models/Session.js';
 // GET: Obtener todo el historial de sesiones de un usuario
 export const getSessions = async (req, res) => {
   try {
-    const { email } = req.query;
-    if (!email) return res.status(400).json({ error: "Falta el email del usuario" });
-
-    const sessions = await Session.find({ userEmail: email }).sort({ date: -1 });
+    const { userEmail } = req.query; 
+    
+    if (!userEmail) return res.status(400).json({ error: "Falta el email del usuario" });
+    const sessions = await Session.find({ userEmail: userEmail }).sort({ date: -1 });
     res.status(200).json(sessions);
   } catch (error) {
     res.status(500).json({ error: "Error al obtener el historial" });
