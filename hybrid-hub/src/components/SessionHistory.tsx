@@ -30,7 +30,7 @@ export const SessionHistory = () => {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const response = await fetch(`/api/sessions?email=${currentUser?.email}`);
+        const response = await fetch(`/api/sessions?userEmail=${currentUser?.email}`);
         if (response.ok) {
           const data = await response.json();
           setSessions(data);
@@ -136,7 +136,6 @@ export const SessionHistory = () => {
       )}
 
       {filteredSessions.map((session) => (
-        // TARJETA DE SESIÓN: Ahora es oscura (bg-iron-800)
         <div key={session._id} className="bg-iron-800 rounded-2xl overflow-hidden transition-all relative group">
           
           {/* CABECERA DE LA TARJETA */}
