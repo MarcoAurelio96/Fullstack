@@ -46,7 +46,7 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
   const [restPerExercise, setRestPerExercise] = useState(180);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (isTimerRunning && timeLeft > 0) {
       interval = setInterval(() => {
         setTimeLeft((prev) => prev - 1);

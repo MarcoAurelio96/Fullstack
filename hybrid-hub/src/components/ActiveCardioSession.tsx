@@ -23,7 +23,7 @@ export const ActiveCardioSession = ({ exercises, onFinish, onCancel }: ActiveCar
   const [isRunning, setIsRunning] = useState(false);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (isRunning) {
       interval = setInterval(() => {
         setTimeElapsed((prev) => prev + 1);
