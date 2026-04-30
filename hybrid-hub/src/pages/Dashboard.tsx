@@ -3,7 +3,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../config/firebase";
 import { useAuth } from "../context/AuthContext";
 
-import { Home, Dumbbell, Activity, Calendar, Plus, User, Loader2, CheckCircle2 } from "lucide-react"; 
+import { Home, Dumbbell, Activity, Calendar, Plus, User, Loader2, CheckCircle2, Trophy } from "lucide-react"; 
 
 import { DashboardCard } from "../components/DashboardCard";
 import { NavItem } from "../components/NavItem";
@@ -43,7 +43,10 @@ export const Dashboard = () => {
   const [height, setHeight] = useState<number | "">("");
   const [weight, setWeight] = useState<number | "">("");
 
-  // --- LÓGICA DE AVATAR AUTOMÁTICO PARA EL NAVBAR ---
+  const [gymCompletedToday, setGymCompletedToday] = useState(false);
+  const [cardioCompletedToday, setCardioCompletedToday] = useState(false);
+  const [showAchievementModal, setShowAchievementModal] = useState<{type: "Gym" | "Cardio" | null}>({ type: null });
+
   const userName = currentUser?.displayName || "Atleta Iron";
   const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=eab308&color=18181b&bold=true&size=150`;
   const imageToDisplay = currentUser?.photoURL || defaultAvatar;
@@ -66,6 +69,31 @@ export const Dashboard = () => {
 
     checkUserStatus();
   }, [currentUser]);
+
+  useEffect(() => {
+    const checkTodaySessions = async () => {
+      if (!currentUser?.email) return;
+      try {
+        const response = await fetch(`/api/sessions?userEmail=${currentUser.email}`);
+        if (response.ok) {
+          const sessions = await response.json();
+          const todayStr = new Date().toLocaleDateString();
+          
+          const todayGym = sessions.some((s: any) => s.sessionType === "Gym" && new Date(s.date || s.createdAt).toLocaleDateString() === todayStr);
+          const todayCardio = sessions.some((s: any) => s.sessionType === "Cardio" && new Date(s.date || s.createdAt).toLocaleDateString() === todayStr);
+          
+          if (todayGym) setGymCompletedToday(true);
+          if (todayCardio) setCardioCompletedToday(true);
+        }
+      } catch (error) {
+        console.error("Error al cargar sesiones de hoy:", error);
+      }
+    };
+    
+    if (!isCheckingUser) {
+       checkTodaySessions();
+    }
+  }, [currentUser, isCheckingUser]);
 
   const handleOnboardingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -135,14 +163,20 @@ export const Dashboard = () => {
         }),
       });
       if (!response.ok) throw new Error("Error al guardar la sesión");
-      console.log("¡Sesión guardada con éxito! 🎉");
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
+      
+      const type = activeSessionType;
+
       setTimeout(() => {
+        if (type === "Gym") setGymCompletedToday(true);
+        if (type === "Cardio") setCardioCompletedToday(true);
+        
         setActiveSession(null);
         setActiveSessionType(null);
-      }, 2000);
+        setShowAchievementModal({ type });
+      }, 1500);
+
+    } catch (error) {
+      console.error("Error:", error);
     }
   };
 
@@ -165,6 +199,33 @@ export const Dashboard = () => {
   return (
     <div className="min-h-screen bg-iron-900 flex flex-col font-sans selection:bg-iron-accent selection:text-iron-900">
       
+      {/* MODAL DE LOGRO DESBLOQUEADO */}
+      {showAchievementModal.type && (
+        <div className="fixed inset-0 bg-iron-900/95 backdrop-blur-md z-[200] flex items-center justify-center p-4 animate-in fade-in duration-300">
+          <div className="bg-iron-800 w-full max-w-sm rounded-[2rem] border-4 border-iron-accent p-8 shadow-2xl animate-in zoom-in-95 duration-500 text-center flex flex-col items-center">
+            
+            <div className="w-24 h-24 bg-iron-900 rounded-full border-4 border-iron-accent flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(255,211,105,0.4)] relative">
+              <Trophy size={48} className="text-iron-accent" />
+              <div className="absolute -bottom-2 -right-2 bg-iron-900 p-2 rounded-full border-2 border-iron-accent shadow-md">
+                 {showAchievementModal.type === "Gym" ? <Dumbbell size={18} className="text-iron-accent"/> : <Activity size={18} className="text-iron-accent"/>}
+              </div>
+            </div>
+            
+            <h2 className="text-2xl font-black text-iron-100 uppercase tracking-tighter mb-2">¡Día Superado!</h2>
+            <p className="text-gray-400 font-medium mb-8 text-sm leading-relaxed">
+              Has destrozado tu sesión de <strong className="text-iron-accent uppercase">{showAchievementModal.type}</strong>. ¡Ya tienes tu medalla diaria, sigue así!
+            </p>
+            
+            <button 
+              onClick={() => setShowAchievementModal({ type: null })}
+              className="w-full bg-iron-accent text-iron-900 font-black py-4 rounded-xl flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-transform uppercase tracking-widest shadow-lg shadow-iron-accent/20"
+            >
+              ¡A por más!
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ONBOARDING MODAL */}
       {showOnboarding && (
         <div className="fixed inset-0 bg-iron-900/95 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
@@ -217,18 +278,31 @@ export const Dashboard = () => {
         </div>
       )}
 
-      {/* NAVBAR PRINCIPAL (Sticky en Desktop, Header limpio en Móvil) */}
+      {/* NAVBAR PRINCIPAL */}
       <nav className="bg-iron-800 p-4 border-b-4 border-iron-900 sticky top-0 z-40 shadow-md">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           
-          {/* Brand/Logo */}
+          {/* Logo y Medallas */}
           <div className="flex items-center gap-2 text-iron-accent">
             <Dumbbell size={28} strokeWidth={1.5} className="sm:w-8 sm:h-8" />
-            {/* Ocultamos el texto en pantallas muy pequeñas si hace falta, aunque aquí entra bien */}
             <h1 className="text-xl sm:text-2xl font-extrabold text-iron-100 tracking-tight uppercase">Iron Pace</h1>
+            
+            {/* INSIGNIAS DIARIAS */}
+            <div className="flex gap-1.5 ml-1 sm:ml-3">
+              {gymCompletedToday && (
+                <div className="bg-yellow-500/20 text-yellow-500 p-1.5 rounded-full border border-yellow-500/50 shadow-[0_0_10px_rgba(234,179,8,0.3)] animate-in zoom-in duration-300" title="¡Gym Completado Hoy!">
+                  <Dumbbell size={14} className="sm:w-[16px] sm:h-[16px]" />
+                </div>
+              )}
+              {cardioCompletedToday && (
+                <div className="bg-blue-500/20 text-blue-500 p-1.5 rounded-full border border-blue-500/50 shadow-[0_0_10px_rgba(59,130,246,0.3)] animate-in zoom-in duration-300" title="¡Cardio Completado Hoy!">
+                  <Activity size={14} className="sm:w-[16px] sm:h-[16px]" />
+                </div>
+              )}
+            </div>
           </div>
           
-          {/* TABS DESKTOP (Se ocultan en móvil 'md:hidden') */}
+          {/* TABS DESKTOP */}
           <div className="hidden md:flex gap-4">
             <div onClick={() => setCurrentTab("Inicio")} className="cursor-pointer">
               <NavItem icon={<Home size={24} />} label="Inicio" isActive={currentTab === "Inicio"} />
@@ -260,7 +334,6 @@ export const Dashboard = () => {
       </nav>
 
       {/* CONTENIDO PRINCIPAL */}
-      {/* pb-28 y md:pb-12 aseguran espacio para el menú inferior en móvil */}
       <main className="flex-grow p-4 pb-28 md:p-12 md:pb-12 relative overflow-x-hidden">
         <div className="max-w-6xl mx-auto flex flex-col gap-8 md:gap-12">
           
@@ -328,7 +401,7 @@ export const Dashboard = () => {
         </div>
       </main>
 
-      {/* NAVBAR INFERIOR MÓVIL (Bottom Bar - Solo visible en sm y md) */}
+      {/* NAVBAR INFERIOR MÓVIL */}
       <nav className="md:hidden fixed bottom-0 left-0 w-full bg-iron-900 border-t-2 border-iron-800 z-40 pb-safe pt-2 px-2 shadow-[0_-10px_20px_rgba(0,0,0,0.3)]">
         <div className="flex justify-around items-center">
           <div onClick={() => setCurrentTab("Inicio")} className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all w-16 ${currentTab === "Inicio" ? "text-iron-accent" : "text-gray-500"}`}>
@@ -353,7 +426,7 @@ export const Dashboard = () => {
         </div>
       </nav>
 
-      {/* MODAL GLOBAL */}
+      {/* MODAL GLOBAL (Selección de Entrenamientos) */}
       <Modal isOpen={isModalOpen} onClose={closeModal}>
         {modalType === "Gym" && <GymExerciseForm />}
         {modalType === "Cardio" && <CardioSessionForm />}
