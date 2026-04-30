@@ -36,6 +36,8 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
     weight: 0 
   });
 
+  const bodyParts = ["Pecho", "Biceps", "Triceps", "Espalda", "Hombro", "Pierna"];
+
   useEffect(() => {
     setSessionExercises(exercises);
   }, [exercises]);
@@ -59,25 +61,31 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
 
   const handleAddCustom = async () => {
     if (!customExercise.name.trim()) return alert("Ponle un nombre al ejercicio");
+    if (!currentUser?.email) return alert("No se detecta el usuario");
     
     setIsSavingCustom(true);
 
     try {
+      const newWorkout = {
+        userEmail: currentUser.email,
+        type: "Gym",
+        category: "Gym",
+        name: customExercise.name,
+        bodyPart: customExercise.bodyPart,
+        sets: Number(customExercise.sets),
+        reps: Number(customExercise.reps),
+        weight: Number(customExercise.weight)
+      };
+
       const response = await fetch("/api/workouts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userEmail: currentUser?.email,
-          name: customExercise.name,
-          type: "Gym",
-          category: customExercise.bodyPart,
-          bodyPart: customExercise.bodyPart
-        })
+        body: JSON.stringify(newWorkout)
       });
 
       if (!response.ok) {
         const errData = await response.json();
-        throw new Error(errData.message || "Error al guardar en la biblioteca");
+        throw new Error(errData.message || "Error al guardar");
       }
 
       const savedWorkout = await response.json();
@@ -85,7 +93,7 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
       const newEx: Exercise = {
         _id: savedWorkout._id, 
         name: savedWorkout.name,
-        bodyPart: savedWorkout.category || savedWorkout.bodyPart || customExercise.bodyPart,
+        bodyPart: savedWorkout.bodyPart,
         sets: customExercise.sets,
         reps: customExercise.reps,
         weight: customExercise.weight
@@ -96,7 +104,7 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
       setCustomExercise({ name: "", bodyPart: "Pecho", sets: 3, reps: 10, weight: 0 }); 
     } catch (error) {
       console.error("Error creando ejercicio rápido:", error);
-      alert("Error al guardar el ejercicio en la base de datos. Revisa la consola.");
+      alert("Error al conectar con el servidor.");
     } finally {
       setIsSavingCustom(false);
     }
@@ -193,14 +201,7 @@ export const ActiveGymSession = ({ exercises, onFinish, onAddExercise, onCancel 
               onChange={(e) => setCustomExercise({...customExercise, bodyPart: e.target.value})}
               className="w-full bg-iron-800 border-2 border-iron-700 rounded-lg p-3 text-iron-100 font-bold outline-none focus:border-iron-accent appearance-none cursor-pointer"
             >
-              <option value="Pecho">Pecho</option>
-              <option value="Espalda">Espalda</option>
-              <option value="Piernas">Piernas</option>
-              <option value="Hombros">Hombros</option>
-              <option value="Brazos">Brazos</option>
-              <option value="Core">Core</option>
-              <option value="Full Body">Full Body</option>
-              <option value="Otro">Otro</option>
+              {bodyParts.map(part => <option key={part} value={part}>{part}</option>)}
             </select>
 
             <div className="flex gap-2">
