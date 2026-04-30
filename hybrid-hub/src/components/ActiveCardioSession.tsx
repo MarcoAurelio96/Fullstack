@@ -46,6 +46,8 @@ export const ActiveCardioSession = ({ exercises, onFinish, onCancel }: ActiveCar
     if (sessionExercises.length > 0 && durationInMinutes > 0) {
       updateField(sessionExercises[0]._id, 'duration', durationInMinutes.toString());
     }
+    
+    setTimeElapsed(0);
   };
 
   const updateField = (id: string, field: 'distance' | 'duration', value: string) => {
