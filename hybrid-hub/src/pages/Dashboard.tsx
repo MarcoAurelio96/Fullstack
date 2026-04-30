@@ -43,6 +43,7 @@ export const Dashboard = () => {
   const [height, setHeight] = useState<number | "">("");
   const [weight, setWeight] = useState<number | "">("");
 
+  // --- LÓGICA DE AVATAR AUTOMÁTICO PARA EL NAVBAR ---
   const userName = currentUser?.displayName || "Atleta Iron";
   const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=eab308&color=18181b&bold=true&size=150`;
   const imageToDisplay = currentUser?.photoURL || defaultAvatar;
@@ -241,7 +242,6 @@ export const Dashboard = () => {
             <button onClick={handleLogout} className="text-gray-400 hover:text-red-400 text-sm font-bold transition-colors">
               Cerrar Sesión
             </button>
-            
             <img 
               onClick={() => setCurrentTab("Perfil")} 
               src={imageToDisplay} 
@@ -257,48 +257,54 @@ export const Dashboard = () => {
           
           {currentTab === "Inicio" && (
             <>
-              <DashboardCard title="AÑADE NUEVOS EJERCICIOS" subtitle="Elige el tipo de ejercicio">
-                <div onClick={() => openModal("Gym")} className="flex flex-col items-center gap-2 group cursor-pointer">
-                  <div className="bg-iron-accent text-iron-900 p-6 rounded-full hover:scale-105 active:scale-95 transition-transform duration-200">
-                    <Dumbbell size={36} strokeWidth={2.5} />
-                  </div>
-                  <span className="text-xl font-bold uppercase text-iron-accent group-hover:scale-105 transition-transform">Gym</span>
-                </div>
-                <div onClick={() => openModal("Cardio")} className="flex flex-col items-center gap-2 group cursor-pointer">
-                  <div className="bg-iron-accent text-iron-900 p-6 rounded-full hover:scale-105 active:scale-95 transition-transform duration-200">
-                    <Activity size={36} strokeWidth={2.5} />
-                  </div>
-                  <span className="text-xl font-bold uppercase text-iron-accent group-hover:scale-105 transition-transform">Cardio</span>
-                </div>
-              </DashboardCard>
+              {!activeSession ? (
+                <>
+                  <DashboardCard title="AÑADE NUEVOS EJERCICIOS" subtitle="Elige el tipo de ejercicio">
+                    <div onClick={() => openModal("Gym")} className="flex flex-col items-center gap-2 group cursor-pointer">
+                      <div className="bg-iron-accent text-iron-900 p-6 rounded-full hover:scale-105 active:scale-95 transition-transform duration-200">
+                        <Dumbbell size={36} strokeWidth={2.5} />
+                      </div>
+                      <span className="text-xl font-bold uppercase text-iron-accent group-hover:scale-105 transition-transform">Gym</span>
+                    </div>
+                    <div onClick={() => openModal("Cardio")} className="flex flex-col items-center gap-2 group cursor-pointer">
+                      <div className="bg-iron-accent text-iron-900 p-6 rounded-full hover:scale-105 active:scale-95 transition-transform duration-200">
+                        <Activity size={36} strokeWidth={2.5} />
+                      </div>
+                      <span className="text-xl font-bold uppercase text-iron-accent group-hover:scale-105 transition-transform">Cardio</span>
+                    </div>
+                  </DashboardCard>
 
-              {activeSession && activeSessionType === "Gym" && (
-                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                   <p className="text-iron-accent font-bold ml-4 mb-4 flex items-center gap-2">
-                     <span className="relative flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-iron-accent opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-iron-accent"></span></span>
-                     Tu sesión activa
-                   </p>
-                   <ActiveGymSession exercises={activeSession} onFinish={finishSession} onAddExercise={() => openModal("SelectGym")} onCancel={cancelSession} />
-                </div>
+                  <p className="text-iron-100 font-medium ml-4 -mb-8">¿Empezamos la sesión?</p>
+
+                  <DashboardCard title="NUEVA SESIÓN DE ENTRENAMIENTO" subtitle="Selecciona los ejercicios de hoy">
+                    <button onClick={() => openModal("ChooseSessionType")} className="bg-iron-accent text-iron-900 p-6 rounded-2xl hover:scale-105 active:scale-95 transition-transform duration-200">
+                      <Plus size={36} strokeWidth={2.5} />
+                    </button>
+                  </DashboardCard>
+                </>
+              ) : (
+                <>
+                  {activeSessionType === "Gym" && (
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                       <p className="text-iron-accent font-bold ml-4 mb-4 flex items-center gap-2">
+                         <span className="relative flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-iron-accent opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-iron-accent"></span></span>
+                         Tu sesión activa
+                       </p>
+                       <ActiveGymSession exercises={activeSession} onFinish={finishSession} onAddExercise={() => openModal("SelectGym")} onCancel={cancelSession} />
+                    </div>
+                  )}
+
+                  {activeSessionType === "Cardio" && (
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                       <p className="text-iron-accent font-bold ml-4 mb-4 flex items-center gap-2">
+                         <span className="relative flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-iron-accent opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-iron-accent"></span></span>
+                         Tu sesión activa
+                       </p>
+                       <ActiveCardioSession exercises={activeSession} onFinish={finishSession} onCancel={cancelSession} />
+                    </div>
+                  )}
+                </>
               )}
-
-              {activeSession && activeSessionType === "Cardio" && (
-                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                   <p className="text-iron-accent font-bold ml-4 mb-4 flex items-center gap-2">
-                     <span className="relative flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-iron-accent opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-iron-accent"></span></span>
-                     Tu sesión activa
-                   </p>
-                   <ActiveCardioSession exercises={activeSession} onFinish={finishSession} onCancel={cancelSession} />
-                </div>
-              )}
-
-              <p className="text-iron-100 font-medium ml-4 -mb-8">¿Empezamos la sesión?</p>
-
-              <DashboardCard title="NUEVA SESIÓN DE ENTRENAMIENTO" subtitle="Selecciona los ejercicios de hoy">
-                <button onClick={() => openModal("ChooseSessionType")} className="bg-iron-accent text-iron-900 p-6 rounded-2xl hover:scale-105 active:scale-95 transition-transform duration-200">
-                  <Plus size={36} strokeWidth={2.5} />
-                </button>
-              </DashboardCard>
             </>
           )}
 
