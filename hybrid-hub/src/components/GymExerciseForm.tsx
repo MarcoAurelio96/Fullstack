@@ -42,9 +42,12 @@ export const GymExerciseForm = () => {
         window.location.reload();
       } else {
         const errorData = await response.json();
+        // ¡AQUÍ ESTÁ LA CORRECCIÓN! Ahora sí usamos errorData en este console.error
+        console.error("❌ Error del servidor:", errorData);
         alert("El servidor rechazó el ejercicio. Revisa los datos.");
       }
     } catch (error) {
+      console.error("❌ Error de red:", error);
       alert("No se pudo conectar con el servidor.");
     }
   };
