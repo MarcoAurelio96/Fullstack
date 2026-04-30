@@ -117,7 +117,7 @@ export const Profile = () => {
         <div className="flex flex-col md:flex-row items-center gap-6">
           
           <div className="relative">
-            <div className="w-32 h-32 rounded-full border-4 border-iron-accent overflow-hidden bg-iron-900 flex items-center justify-center shadow-lg">
+            <div className="w-32 h-32 rounded-full border-4 border-white overflow-hidden bg-iron-900 flex items-center justify-center shadow-lg">
               <img src={imageToDisplay} alt="Perfil del Atleta" className="w-full h-full object-cover" />
             </div>
           </div>

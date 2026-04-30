@@ -3,7 +3,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../config/firebase";
 import { useAuth } from "../context/AuthContext";
 
-import { Home, Dumbbell, Activity, Calendar, Plus, User, Loader2, CheckCircle2 } from "lucide-react"; // 2. Añadimos iconos nuevos
+import { Home, Dumbbell, Activity, Calendar, Plus, User, Loader2, CheckCircle2 } from "lucide-react"; 
 
 import { DashboardCard } from "../components/DashboardCard";
 import { NavItem } from "../components/NavItem";
@@ -42,6 +42,10 @@ export const Dashboard = () => {
   const [gender, setGender] = useState("Hombre");
   const [height, setHeight] = useState<number | "">("");
   const [weight, setWeight] = useState<number | "">("");
+
+  const userName = currentUser?.displayName || "Atleta Iron";
+  const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=eab308&color=18181b&bold=true&size=150`;
+  const imageToDisplay = currentUser?.photoURL || defaultAvatar;
 
   useEffect(() => {
     const checkUserStatus = async () => {
@@ -237,9 +241,13 @@ export const Dashboard = () => {
             <button onClick={handleLogout} className="text-gray-400 hover:text-red-400 text-sm font-bold transition-colors">
               Cerrar Sesión
             </button>
-            <div onClick={() => setCurrentTab("Perfil")} className="bg-iron-900 text-iron-accent p-3 rounded-xl border-2 border-transparent hover:border-iron-accent transition-colors cursor-pointer">
-              <User size={24} />
-            </div>
+            
+            <img 
+              onClick={() => setCurrentTab("Perfil")} 
+              src={imageToDisplay} 
+              alt="Avatar Perfil" 
+              className="w-10 h-10 rounded-full border-2 border-white hover:scale-105 transition-transform cursor-pointer object-cover shadow-md"
+            />
           </div>
         </div>
       </nav>
